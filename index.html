@@ -71,6 +71,134 @@ h1,h2,h3,h4 { font-family: 'Space Grotesk', sans-serif; }
   gap: 1rem;
 }
 
+/* ── LANDING PAGE ── */
+#landing-page {
+  max-width: 1180px;
+  margin: 1.5rem auto 2rem;
+  padding: 1rem 1.5rem 2rem;
+  position: relative;
+  z-index: 1;
+}
+#landing-page::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(circle at top left, rgba(167,139,250,0.18), transparent 28%),
+              radial-gradient(circle at bottom right, rgba(245,200,66,0.14), transparent 28%);
+  pointer-events: none;
+  filter: blur(36px);
+}
+.landing-hero {
+  position: relative;
+  display: grid;
+  grid-template-columns: minmax(0,1.3fr) minmax(320px,0.9fr);
+  gap: 1.75rem;
+  padding: 2rem;
+  background: linear-gradient(180deg, rgba(20,23,40,0.95), rgba(13,15,26,0.92));
+  border: 1px solid rgba(255,255,255,0.08);
+  border-radius: calc(var(--radius-lg) + 4px);
+  overflow: hidden;
+}
+.landing-hero::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(135deg, rgba(255,255,255,0.03), transparent 40%);
+  pointer-events: none;
+}
+.landing-copy, .landing-preview {
+  position: relative;
+  z-index: 1;
+}
+.landing-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.82rem;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: var(--gold);
+  background: rgba(245,200,66,0.12);
+  border: 1px solid rgba(245,200,66,0.18);
+  border-radius: 999px;
+  padding: 0.65rem 0.95rem;
+  margin-bottom: 1rem;
+}
+.landing-title { font-size: clamp(2.4rem, 5vw, 4.2rem); line-height: 1.02; margin-bottom: 1rem; }
+.landing-subtitle { font-size: 1rem; max-width: 620px; line-height: 1.75; color: var(--text2); margin-bottom: 1.8rem; }
+.landing-actions { display: flex; flex-wrap: wrap; gap: 0.9rem; margin-bottom: 1.75rem; }
+.landing-actions .btn { min-width: 160px; }
+.landing-stats {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(120px, 1fr));
+  gap: 0.85rem;
+}
+.landing-stat {
+  background: rgba(255,255,255,0.04);
+  border: 1px solid rgba(255,255,255,0.06);
+  border-radius: var(--radius);
+  padding: 1rem;
+  text-align: center;
+}
+.landing-stat strong { display: block; font-size: 1.25rem; margin-bottom: 0.25rem; color: var(--text); }
+.landing-stat span { color: var(--text2); font-size: 0.82rem; }
+.landing-preview { display: grid; gap: 1rem; }
+.preview-card {
+  background: linear-gradient(180deg, rgba(22,26,52,0.98), rgba(18,21,44,0.98));
+  border: 1px solid rgba(255,255,255,0.08);
+  border-radius: var(--radius-lg);
+  padding: 1.35rem;
+  box-shadow: 0 30px 80px rgba(0,0,0,0.18);
+}
+.preview-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 1.1rem; }
+.preview-panel { display: grid; gap: 0.8rem; }
+.preview-panel-item {
+  background: var(--bg3);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 0.9rem 1rem;
+}
+.preview-panel-item strong { display: block; margin-bottom: 0.25rem; font-size: 0.92rem; }
+.preview-panel-item span { color: var(--text3); font-size: 0.78rem; }
+.landing-features {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(220px, 1fr));
+  gap: 1rem;
+  margin-top: 1.5rem;
+}
+.feature-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 1.25rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+}
+.feature-icon {
+  width: 42px;
+  height: 42px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 14px;
+  background: rgba(167,139,250,0.12);
+  font-size: 1.2rem;
+}
+.feature-title { font-size: 1rem; font-weight: 700; }
+.feature-desc { color: var(--text2); font-size: 0.88rem; line-height: 1.6; }
+@media (max-width: 960px) {
+  .landing-hero { grid-template-columns: 1fr; padding: 1.6rem; }
+  .landing-stat { padding: 0.9rem; }
+  .landing-features { grid-template-columns: 1fr; }
+}
+@media (max-width: 680px) {
+  #landing-page { padding: 1rem; margin-top: 0.8rem; }
+  .landing-actions { flex-direction: column; align-items: stretch; }
+  .landing-stats { grid-template-columns: 1fr; }
+}
+
 .header-brand {
   display: flex; align-items: center; gap: 10px;
 }
@@ -728,6 +856,61 @@ h1,h2,h3,h4 { font-family: 'Space Grotesk', sans-serif; }
     </div>
   </div>
 </header>
+
+<section id="landing-page">
+  <div class="landing-hero">
+    <div class="landing-copy">
+      <span class="landing-pill">Gamify your daily flow</span>
+      <h1 class="landing-title">Welcome to HabitQuest — build better habits with every win.</h1>
+      <p class="landing-subtitle">Keep the same dark, immersive theme while tracking habits, earning XP, unlocking rewards, and staying motivated with a sleek, modern dashboard.</p>
+      <div class="landing-actions">
+        <button class="btn btn-primary" onclick="scrollToApp()">Start Tracking</button>
+        <button class="btn btn-ghost" onclick="scrollToSection('features')">See features</button>
+      </div>
+      <div class="landing-stats">
+        <div class="landing-stat"><strong>10+</strong><span>Built-in habits</span></div>
+        <div class="landing-stat"><strong>XP & rewards</strong><span>Level-up motivation</span></div>
+        <div class="landing-stat"><strong>Live dashboard</strong><span>Track progress instantly</span></div>
+      </div>
+    </div>
+    <div class="landing-preview">
+      <div class="preview-card">
+        <div class="preview-header">
+          <div>
+            <div style="font-size:0.8rem;color:var(--text2);margin-bottom:0.35rem">Today's progress</div>
+            <div style="display:flex;align-items:center;gap:0.75rem;flex-wrap:wrap">
+              <span style="font-size:1.6rem;font-weight:700;color:var(--text)">78%</span>
+              <span style="background:rgba(96,165,250,0.12);color:var(--blue);padding:0.4rem 0.75rem;border-radius:999px;font-size:0.78rem;">XP streak</span>
+            </div>
+          </div>
+          <span style="font-size:1.2rem;">📈</span>
+        </div>
+        <div class="preview-panel">
+          <div class="preview-panel-item"><strong>Mission</strong><span>Meditate, exercise, and learn daily.</span></div>
+          <div class="preview-panel-item"><strong>Rewards</strong><span>Earn coins, unlock avatars, and level up.</span></div>
+          <div class="preview-panel-item"><strong>Focus</strong><span>Custom categories for habits and quests.</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="landing-features" id="features">
+    <div class="feature-card">
+      <div class="feature-icon">🌟</div>
+      <div class="feature-title">Track every habit</div>
+      <div class="feature-desc">Organize daily routines with powerful progress cards, streak tracking, and completion rewards.</div>
+    </div>
+    <div class="feature-card">
+      <div class="feature-icon">🏆</div>
+      <div class="feature-title">Earn XP & coins</div>
+      <div class="feature-desc">Turn habits into a game with XP, coins, achievement badges, and reward unlocks.</div>
+    </div>
+    <div class="feature-card">
+      <div class="feature-icon">🎮</div>
+      <div class="feature-title">Built for momentum</div>
+      <div class="feature-desc">Stay motivated with streak bonuses, daily quests, and a dark fantasy-inspired dashboard.</div>
+    </div>
+  </div>
+</section>
 
 <!-- LAYOUT -->
 <div id="app-layout">
@@ -1930,6 +2113,20 @@ function animateParticles(){
 // UTILS
 // ════════════════════════════════════════
 function escHtml(s){ const d=document.createElement('div');d.textContent=s;return d.innerHTML; }
+
+function scrollToApp(){
+  const target = document.getElementById('app-layout');
+  if(target){
+    target.scrollIntoView({behavior:'smooth', block:'start'});
+  }
+}
+
+function scrollToSection(id){
+  const target = document.getElementById(id);
+  if(target){
+    target.scrollIntoView({behavior:'smooth', block:'start'});
+  }
+}
 
 // ════════════════════════════════════════
 // INIT
