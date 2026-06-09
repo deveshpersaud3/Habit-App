@@ -1232,12 +1232,31 @@ function playSound(type){
     } else if(type === 'challenge'){
       freq = 660;
       gain.gain.exponentialRampToValueAtTime(0.2, ctx.currentTime + 0.01);
+    } else if(type === 'perfect'){
+      freq = 880;
+      decay = 0.5;
+      gain.gain.exponentialRampToValueAtTime(0.3, ctx.currentTime + 0.01);
+      osc.type = 'sine';
+      osc.frequency.setValueAtTime(freq, ctx.currentTime);
+      const osc2 = ctx.createOscillator();
+      const gain2 = ctx.createGain();
+      osc2.connect(gain2);
+      gain2.connect(ctx.destination);
+      gain2.gain.setValueAtTime(0.0001, ctx.currentTime);
+      gain2.gain.exponentialRampToValueAtTime(0.18, ctx.currentTime + 0.01);
+      osc2.type = 'triangle';
+      osc2.frequency.setValueAtTime(freq * 1.25, ctx.currentTime);
+      osc2.start();
+      gain2.gain.exponentialRampToValueAtTime(0.0001, ctx.currentTime + decay);
+      osc2.stop(ctx.currentTime + decay + 0.02);
     } else {
       freq = 440;
       gain.gain.exponentialRampToValueAtTime(0.18, ctx.currentTime + 0.01);
     }
-    osc.type = 'triangle';
-    osc.frequency.setValueAtTime(freq, ctx.currentTime);
+    if(type !== 'perfect'){
+      osc.type = 'triangle';
+      osc.frequency.setValueAtTime(freq, ctx.currentTime);
+    }
     osc.start();
     gain.gain.exponentialRampToValueAtTime(0.0001, ctx.currentTime + decay);
     osc.stop(ctx.currentTime + decay + 0.02);
@@ -1709,6 +1728,7 @@ function toggleHabit(id, evt){
       state.hadPerfectDay = true;
       addCoins(50);
       showNotif('achieve','✨','Perfect Day!','+50 bonus coins for all habits complete!');
+      playSound('perfect');
       launchConfetti();
     }
   } else {
