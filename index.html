@@ -1,54 +1,1846 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Habit Tracker</title>
-    <link rel="stylesheet" href="styles.css">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>HabitQuest — Level Up Your Life</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #0d0f1a;
+  --bg2: #141728;
+  --bg3: #1c2038;
+  --bg4: #232747;
+  --surface: #1e2240;
+  --border: rgba(255,255,255,0.07);
+  --border2: rgba(255,255,255,0.12);
+  --text: #f0f2ff;
+  --text2: #9da6cc;
+  --text3: #626a92;
+  --gold: #f5c842;
+  --gold2: #e8a800;
+  --xp: #a78bfa;
+  --xp2: #7c3aed;
+  --green: #34d399;
+  --green2: #059669;
+  --red: #f87171;
+  --red2: #dc2626;
+  --blue: #60a5fa;
+  --blue2: #2563eb;
+  --orange: #fb923c;
+  --pink: #f472b6;
+  --teal: #2dd4bf;
+  --radius: 12px;
+  --radius-sm: 8px;
+  --radius-lg: 16px;
+  --radius-xl: 20px;
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  font-family: 'Inter', sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+h1,h2,h3,h4 { font-family: 'Space Grotesk', sans-serif; }
+
+/* ── SCROLLBAR ── */
+::-webkit-scrollbar { width: 4px; }
+::-webkit-scrollbar-track { background: var(--bg); }
+::-webkit-scrollbar-thumb { background: var(--bg4); border-radius: 4px; }
+
+/* ── CANVAS FOR EFFECTS ── */
+#particle-canvas {
+  position: fixed; inset: 0;
+  pointer-events: none; z-index: 9999;
+}
+
+/* ── TOP HEADER BAR ── */
+#app-header {
+  position: sticky; top: 0; z-index: 100;
+  background: rgba(13,15,26,0.92);
+  backdrop-filter: blur(12px);
+  border-bottom: 1px solid var(--border);
+  padding: 0.75rem 1.5rem;
+  display: flex; align-items: center; justify-content: space-between;
+  gap: 1rem;
+}
+
+.header-brand {
+  display: flex; align-items: center; gap: 10px;
+}
+.brand-icon {
+  width: 34px; height: 34px;
+  background: linear-gradient(135deg, var(--xp), var(--gold));
+  border-radius: 9px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 18px;
+}
+.brand-name {
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 1.1rem; font-weight: 700;
+  background: linear-gradient(90deg, var(--xp), var(--gold));
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+}
+
+.header-stats {
+  display: flex; align-items: center; gap: 0.75rem; flex-wrap: wrap;
+}
+
+.stat-pill {
+  display: flex; align-items: center; gap: 6px;
+  background: var(--bg3);
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  padding: 5px 12px;
+  font-size: 0.82rem; font-weight: 500;
+  cursor: default;
+  transition: border-color 0.2s;
+}
+.stat-pill:hover { border-color: var(--border2); }
+.stat-pill .icon { font-size: 14px; }
+.stat-pill.gold .icon { color: var(--gold); }
+.stat-pill.xp .icon { color: var(--xp); }
+.stat-pill.streak .icon { color: var(--orange); }
+.coin-count { color: var(--gold); font-weight: 700; }
+.xp-count { color: var(--xp); font-weight: 700; }
+.streak-count { color: var(--orange); font-weight: 700; }
+
+/* ── LAYOUT ── */
+#app-layout {
+  display: grid;
+  grid-template-columns: 240px 1fr 280px;
+  gap: 0;
+  min-height: calc(100vh - 57px);
+}
+
+/* ── SIDEBAR ── */
+#sidebar {
+  background: var(--bg2);
+  border-right: 1px solid var(--border);
+  padding: 1.5rem 1rem;
+  display: flex; flex-direction: column; gap: 0.5rem;
+}
+
+.nav-item {
+  display: flex; align-items: center; gap: 10px;
+  padding: 10px 12px;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  transition: all 0.15s;
+  font-size: 0.88rem; font-weight: 500;
+  color: var(--text2);
+  border: 1px solid transparent;
+  user-select: none;
+}
+.nav-item .nav-icon { font-size: 17px; width: 20px; text-align: center; }
+.nav-item:hover { background: var(--bg3); color: var(--text); }
+.nav-item.active {
+  background: var(--bg4);
+  border-color: var(--border2);
+  color: var(--text);
+}
+.nav-item.active .nav-icon { color: var(--xp); }
+
+.sidebar-section {
+  font-size: 0.7rem; font-weight: 600; letter-spacing: 0.08em;
+  color: var(--text3); text-transform: uppercase;
+  padding: 1rem 12px 0.4rem;
+}
+
+/* Avatar card in sidebar */
+.player-card {
+  background: var(--bg3);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 1rem;
+  margin-bottom: 1rem;
+}
+.player-avatar {
+  width: 48px; height: 48px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--xp2), var(--blue2));
+  display: flex; align-items: center; justify-content: center;
+  font-size: 22px; margin-bottom: 0.75rem;
+  border: 2px solid var(--xp);
+}
+.player-name {
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 0.95rem; font-weight: 600; margin-bottom: 2px;
+}
+.player-level-label {
+  font-size: 0.75rem; color: var(--text2); margin-bottom: 0.75rem;
+}
+.level-badge {
+  display: inline-block;
+  background: linear-gradient(90deg, var(--xp2), var(--blue2));
+  color: white; font-size: 0.7rem; font-weight: 700;
+  padding: 2px 8px; border-radius: 999px; margin-left: 4px;
+}
+.xp-bar-wrap {
+  display: flex; align-items: center; gap: 8px; font-size: 0.72rem; color: var(--text3);
+}
+.xp-bar-bg {
+  flex: 1; height: 6px; background: var(--bg4); border-radius: 3px; overflow: hidden;
+}
+.xp-bar-fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--xp), var(--blue));
+  border-radius: 3px;
+  transition: width 0.6s cubic-bezier(0.34,1.56,0.64,1);
+}
+
+/* ── MAIN CONTENT ── */
+#main-content {
+  padding: 1.5rem;
+  overflow-y: auto;
+  max-height: calc(100vh - 57px);
+}
+
+/* ── RIGHT PANEL ── */
+#right-panel {
+  background: var(--bg2);
+  border-left: 1px solid var(--border);
+  padding: 1.5rem 1rem;
+  overflow-y: auto;
+  max-height: calc(100vh - 57px);
+}
+
+/* ── SECTION VIEWS ── */
+.view { display: none; }
+.view.active { display: block; }
+
+/* ── HABIT LIST VIEW ── */
+.view-header {
+  display: flex; align-items: flex-start; justify-content: space-between;
+  margin-bottom: 1.5rem; gap: 1rem;
+}
+.view-title { font-size: 1.5rem; font-weight: 700; margin-bottom: 2px; }
+.view-subtitle { font-size: 0.83rem; color: var(--text2); }
+
+.progress-overview {
+  display: grid; grid-template-columns: 1fr 1fr 1fr;
+  gap: 0.75rem; margin-bottom: 1.5rem;
+}
+.ov-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 1rem;
+  text-align: center;
+}
+.ov-num {
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 1.8rem; font-weight: 700; line-height: 1;
+}
+.ov-label { font-size: 0.72rem; color: var(--text2); margin-top: 4px; }
+.ov-card.total .ov-num { color: var(--blue); }
+.ov-card.done .ov-num { color: var(--green); }
+.ov-card.pct .ov-num { color: var(--gold); }
+
+/* Big progress ring */
+.daily-ring-wrap {
+  display: flex; align-items: center; gap: 1.5rem;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 1.25rem 1.5rem;
+  margin-bottom: 1.5rem;
+}
+.ring-svg { flex-shrink: 0; }
+.ring-bg { fill: none; stroke: var(--bg4); }
+.ring-fill {
+  fill: none;
+  stroke: url(#ringGrad);
+  stroke-linecap: round;
+  transition: stroke-dashoffset 0.8s cubic-bezier(0.34,1.56,0.64,1);
+}
+.ring-text-pct {
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 1.1rem; font-weight: 700; fill: var(--text);
+}
+.ring-text-label { font-size: 0.55rem; fill: var(--text2); }
+.ring-info h3 { font-size: 1rem; font-weight: 600; margin-bottom: 0.25rem; }
+.ring-info p { font-size: 0.82rem; color: var(--text2); line-height: 1.5; }
+
+/* Habit items */
+.habits-container { display: flex; flex-direction: column; gap: 0.6rem; }
+
+.habit-item {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 0.9rem 1rem;
+  display: flex; align-items: center; gap: 0.85rem;
+  transition: all 0.2s;
+  position: relative; overflow: hidden;
+  cursor: pointer;
+}
+.habit-item:hover { border-color: var(--border2); background: var(--bg3); }
+.habit-item.completed {
+  border-color: rgba(52,211,153,0.25);
+  background: rgba(52,211,153,0.05);
+}
+.habit-item.completed .habit-name {
+  text-decoration: line-through;
+  color: var(--text2);
+}
+
+.habit-check {
+  width: 24px; height: 24px; border-radius: 7px;
+  border: 2px solid var(--border2);
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0; transition: all 0.2s;
+  background: transparent;
+  cursor: pointer;
+}
+.habit-check.checked {
+  background: var(--green); border-color: var(--green);
+}
+.habit-check.checked::after {
+  content: '✓'; font-size: 13px; font-weight: 700; color: white;
+}
+.habit-check:hover { border-color: var(--green); }
+
+.habit-info { flex: 1; min-width: 0; }
+.habit-name { font-size: 0.9rem; font-weight: 500; }
+.habit-meta { font-size: 0.72rem; color: var(--text3); margin-top: 2px; }
+
+.habit-streak-badge {
+  font-size: 0.72rem; font-weight: 600;
+  background: rgba(251,146,60,0.15);
+  color: var(--orange);
+  border: 1px solid rgba(251,146,60,0.3);
+  border-radius: 999px;
+  padding: 2px 8px;
+  white-space: nowrap;
+}
+
+.habit-xp-badge {
+  font-size: 0.72rem; font-weight: 600;
+  background: rgba(167,139,250,0.15);
+  color: var(--xp);
+  border-radius: 999px;
+  padding: 2px 8px;
+  white-space: nowrap;
+}
+
+.habit-delete-btn {
+  background: none; border: none;
+  color: var(--text3); font-size: 15px;
+  cursor: pointer; padding: 4px;
+  border-radius: 6px; transition: all 0.15s;
+  flex-shrink: 0;
+}
+.habit-delete-btn:hover { color: var(--red); background: rgba(248,113,113,0.1); }
+
+/* Add habit form */
+.add-habit-card {
+  background: var(--surface);
+  border: 1px dashed var(--border2);
+  border-radius: var(--radius);
+  padding: 1rem;
+  margin-top: 1rem;
+}
+.add-habit-card h3 { font-size: 0.9rem; margin-bottom: 0.75rem; color: var(--text2); }
+.add-habit-row {
+  display: flex; gap: 0.5rem; align-items: center;
+}
+.habit-input {
+  flex: 1; background: var(--bg3);
+  border: 1px solid var(--border2);
+  border-radius: var(--radius-sm);
+  padding: 0.55rem 0.85rem;
+  color: var(--text); font-size: 0.88rem;
+  outline: none; transition: border-color 0.2s;
+  font-family: 'Inter', sans-serif;
+}
+.habit-input::placeholder { color: var(--text3); }
+.habit-input:focus { border-color: var(--xp); }
+
+.category-select {
+  background: var(--bg3);
+  border: 1px solid var(--border2);
+  border-radius: var(--radius-sm);
+  padding: 0.55rem 0.7rem;
+  color: var(--text); font-size: 0.82rem;
+  outline: none; cursor: pointer;
+  font-family: 'Inter', sans-serif;
+}
+
+.btn {
+  padding: 0.55rem 1.1rem;
+  border: none; border-radius: var(--radius-sm);
+  font-size: 0.85rem; font-weight: 600;
+  cursor: pointer; transition: all 0.15s;
+  font-family: 'Inter', sans-serif;
+  white-space: nowrap;
+}
+.btn-primary {
+  background: linear-gradient(135deg, var(--xp2), var(--blue2));
+  color: white;
+}
+.btn-primary:hover { filter: brightness(1.1); transform: translateY(-1px); }
+.btn-primary:active { transform: translateY(0); }
+.btn-ghost {
+  background: var(--bg4); color: var(--text2);
+  border: 1px solid var(--border);
+}
+.btn-ghost:hover { border-color: var(--border2); color: var(--text); }
+
+/* ── CHALLENGES ── */
+.challenge-grid { display: flex; flex-direction: column; gap: 0.75rem; }
+.challenge-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 1rem 1.1rem;
+  display: flex; align-items: center; gap: 1rem;
+}
+.challenge-card.completed { opacity: 0.6; }
+.challenge-icon {
+  width: 40px; height: 40px; border-radius: 10px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 20px; flex-shrink: 0;
+}
+.challenge-info { flex: 1; }
+.challenge-name { font-size: 0.88rem; font-weight: 600; margin-bottom: 3px; }
+.challenge-desc { font-size: 0.75rem; color: var(--text2); margin-bottom: 6px; }
+.challenge-progress-bar {
+  height: 4px; background: var(--bg4); border-radius: 2px; overflow: hidden;
+}
+.challenge-progress-fill {
+  height: 100%; border-radius: 2px;
+  background: linear-gradient(90deg, var(--xp), var(--blue));
+  transition: width 0.5s ease;
+}
+.challenge-reward {
+  font-size: 0.72rem; font-weight: 600;
+  padding: 3px 9px; border-radius: 999px;
+}
+.reward-gold { background: rgba(245,200,66,0.15); color: var(--gold); }
+.reward-xp { background: rgba(167,139,250,0.15); color: var(--xp); }
+
+/* ── ACHIEVEMENTS ── */
+.achievements-grid {
+  display: grid; grid-template-columns: 1fr 1fr;
+  gap: 0.65rem;
+}
+.achievement-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 0.85rem;
+  display: flex; align-items: center; gap: 0.75rem;
+  transition: all 0.2s;
+}
+.achievement-card.unlocked { border-color: rgba(245,200,66,0.3); background: rgba(245,200,66,0.04); }
+.achievement-card.locked { opacity: 0.5; filter: grayscale(0.7); }
+.achievement-icon {
+  font-size: 24px; width: 44px; height: 44px;
+  background: var(--bg4); border-radius: 10px;
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0;
+}
+.achievement-name { font-size: 0.8rem; font-weight: 600; margin-bottom: 2px; }
+.achievement-desc { font-size: 0.7rem; color: var(--text2); }
+.achievement-unlocked-label {
+  font-size: 0.65rem; color: var(--gold); font-weight: 600; margin-top: 2px;
+}
+
+/* ── SHOP ── */
+.shop-tabs {
+  display: flex; gap: 0.5rem; margin-bottom: 1rem;
+}
+.shop-tab {
+  padding: 6px 14px; border-radius: 999px;
+  font-size: 0.8rem; font-weight: 500; cursor: pointer;
+  background: var(--bg4); color: var(--text2);
+  border: 1px solid var(--border);
+  transition: all 0.15s;
+}
+.shop-tab.active { background: var(--xp2); color: white; border-color: transparent; }
+.shop-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 0.65rem; }
+.shop-item {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 0.9rem;
+  display: flex; flex-direction: column; align-items: center;
+  gap: 0.5rem; text-align: center; cursor: pointer;
+  transition: all 0.2s;
+}
+.shop-item:hover { border-color: var(--border2); transform: translateY(-2px); }
+.shop-item.owned { border-color: rgba(52,211,153,0.3); }
+.shop-item.active-item { border-color: var(--xp); box-shadow: 0 0 0 1px var(--xp); }
+.shop-item-icon { font-size: 28px; }
+.shop-item-name { font-size: 0.8rem; font-weight: 600; }
+.shop-item-desc { font-size: 0.7rem; color: var(--text2); }
+.shop-item-price {
+  display: flex; align-items: center; gap: 4px;
+  font-size: 0.78rem; font-weight: 700; color: var(--gold);
+}
+.shop-item-owned { font-size: 0.72rem; color: var(--green); font-weight: 600; }
+
+/* ── STATS VIEW ── */
+.stats-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem; margin-bottom: 1.5rem; }
+.stat-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 1rem 1.1rem;
+}
+.stat-card-num {
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 1.6rem; font-weight: 700;
+}
+.stat-card-label { font-size: 0.75rem; color: var(--text2); margin-top: 3px; }
+
+.calendar-grid {
+  display: grid; grid-template-columns: repeat(7, 1fr);
+  gap: 4px; margin-top: 0.75rem;
+}
+.cal-day {
+  aspect-ratio: 1; border-radius: 5px;
+  background: var(--bg4); font-size: 0.65rem;
+  display: flex; align-items: center; justify-content: center;
+  color: var(--text3); transition: all 0.2s;
+}
+.cal-day.active-day { background: var(--green2); color: white; }
+.cal-day.today { box-shadow: 0 0 0 2px var(--xp); }
+.cal-day-label { font-size: 0.6rem; color: var(--text3); text-align: center; padding-bottom: 3px; }
+
+/* ── RIGHT PANEL: Streak + Leaderboard ── */
+.panel-section { margin-bottom: 1.5rem; }
+.panel-title {
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 0.85rem; font-weight: 600;
+  color: var(--text2); text-transform: uppercase;
+  letter-spacing: 0.06em; margin-bottom: 0.75rem;
+  display: flex; align-items: center; gap: 6px;
+}
+
+.streak-display {
+  background: linear-gradient(135deg, rgba(251,146,60,0.15), rgba(245,200,66,0.1));
+  border: 1px solid rgba(251,146,60,0.3);
+  border-radius: var(--radius-lg);
+  padding: 1.1rem;
+  text-align: center;
+  margin-bottom: 0.75rem;
+}
+.streak-flame { font-size: 2.5rem; line-height: 1; }
+.streak-num {
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 2rem; font-weight: 800;
+  color: var(--orange); line-height: 1.1;
+}
+.streak-unit { font-size: 0.75rem; color: var(--text2); }
+
+.streak-milestones { display: flex; flex-direction: column; gap: 0.4rem; }
+.milestone-row {
+  display: flex; align-items: center; justify-content: space-between;
+  background: var(--bg3); border-radius: var(--radius-sm);
+  padding: 7px 10px; font-size: 0.78rem;
+}
+.milestone-row.reached { border-left: 3px solid var(--gold); }
+.milestone-left { display: flex; align-items: center; gap: 6px; }
+.milestone-icon { font-size: 14px; }
+.milestone-reward { font-size: 0.72rem; color: var(--gold); font-weight: 600; }
+.milestone-reached-badge {
+  font-size: 0.65rem; background: rgba(52,211,153,0.15);
+  color: var(--green); padding: 2px 6px; border-radius: 999px;
+}
+
+/* Daily quests */
+.quest-list { display: flex; flex-direction: column; gap: 0.5rem; }
+.quest-item {
+  background: var(--bg3);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 8px 10px;
+  display: flex; align-items: center; gap: 8px;
+}
+.quest-item.completed { opacity: 0.6; }
+.quest-check {
+  width: 18px; height: 18px; border-radius: 50%;
+  border: 2px solid var(--border2);
+  flex-shrink: 0; display: flex; align-items: center; justify-content: center;
+}
+.quest-check.done { background: var(--green); border-color: var(--green); }
+.quest-check.done::after { content: '✓'; font-size: 10px; color: white; font-weight: 700; }
+.quest-name { flex: 1; font-size: 0.78rem; }
+.quest-reward { font-size: 0.7rem; color: var(--gold); font-weight: 600; }
+
+/* ── NOTIFICATIONS ── */
+#notif-container {
+  position: fixed; bottom: 1.5rem; right: 1.5rem;
+  z-index: 9998; display: flex; flex-direction: column-reverse; gap: 0.5rem;
+  pointer-events: none;
+}
+
+.notif {
+  background: var(--bg2);
+  border: 1px solid var(--border2);
+  border-radius: var(--radius);
+  padding: 0.75rem 1rem;
+  font-size: 0.83rem;
+  display: flex; align-items: center; gap: 8px;
+  min-width: 220px; max-width: 300px;
+  animation: notif-in 0.35s cubic-bezier(0.34,1.56,0.64,1) forwards;
+  pointer-events: auto;
+}
+.notif.fade-out { animation: notif-out 0.3s ease forwards; }
+.notif-icon { font-size: 18px; flex-shrink: 0; }
+.notif-text { flex: 1; }
+.notif-title { font-weight: 600; }
+.notif-sub { font-size: 0.75rem; color: var(--text2); }
+.notif.xp { border-color: rgba(167,139,250,0.4); }
+.notif.coin { border-color: rgba(245,200,66,0.4); }
+.notif.achieve { border-color: rgba(245,200,66,0.6); }
+.notif.level { border-color: rgba(96,165,250,0.5); background: rgba(37,99,235,0.1); }
+.notif.streak-bonus { border-color: rgba(251,146,60,0.4); }
+
+@keyframes notif-in {
+  from { opacity: 0; transform: translateX(20px) scale(0.95); }
+  to { opacity: 1; transform: translateX(0) scale(1); }
+}
+@keyframes notif-out {
+  from { opacity: 1; transform: translateX(0) scale(1); }
+  to { opacity: 0; transform: translateX(20px) scale(0.95); }
+}
+
+/* ── LEVEL UP MODAL ── */
+#modal-overlay {
+  position: fixed; inset: 0; z-index: 9000;
+  background: rgba(0,0,0,0.7);
+  backdrop-filter: blur(4px);
+  display: flex; align-items: center; justify-content: center;
+  opacity: 0; pointer-events: none;
+  transition: opacity 0.3s;
+}
+#modal-overlay.visible { opacity: 1; pointer-events: auto; }
+.modal-box {
+  background: var(--bg2);
+  border: 1px solid var(--border2);
+  border-radius: var(--radius-xl);
+  padding: 2.5rem;
+  text-align: center; max-width: 340px; width: 90%;
+  animation: modal-pop 0.4s cubic-bezier(0.34,1.56,0.64,1);
+}
+@keyframes modal-pop {
+  from { transform: scale(0.7); }
+  to { transform: scale(1); }
+}
+.modal-emoji { font-size: 4rem; margin-bottom: 1rem; }
+.modal-title { font-size: 1.5rem; font-weight: 800; margin-bottom: 0.5rem; }
+.modal-sub { font-size: 0.9rem; color: var(--text2); margin-bottom: 1.5rem; }
+.modal-rewards { display: flex; gap: 0.75rem; justify-content: center; margin-bottom: 1.5rem; }
+.modal-reward-pill {
+  background: var(--bg3); border: 1px solid var(--border2);
+  border-radius: 999px; padding: 6px 14px; font-size: 0.82rem; font-weight: 600;
+}
+
+/* ── RESPONSIVE ── */
+@media (max-width: 900px) {
+  #app-layout { grid-template-columns: 56px 1fr; }
+  #right-panel { display: none; }
+  .nav-item span { display: none; }
+  .nav-item { justify-content: center; padding: 10px; }
+  .player-card { display: none; }
+  .sidebar-section { display: none; }
+}
+@media (max-width: 640px) {
+  #app-layout { grid-template-columns: 1fr; }
+  #sidebar { display: none; }
+  .progress-overview { grid-template-columns: 1fr 1fr 1fr; }
+}
+
+/* ── SHIMMER EFFECT ── */
+@keyframes shimmer {
+  0% { background-position: -200% center; }
+  100% { background-position: 200% center; }
+}
+.shimmer-text {
+  background: linear-gradient(90deg, var(--text2), var(--gold), var(--text2));
+  background-size: 200% auto;
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+  animation: shimmer 3s linear infinite;
+}
+
+/* Pulse animation */
+@keyframes pulse-ring {
+  0% { box-shadow: 0 0 0 0 rgba(167,139,250,0.4); }
+  70% { box-shadow: 0 0 0 10px rgba(167,139,250,0); }
+  100% { box-shadow: 0 0 0 0 rgba(167,139,250,0); }
+}
+.pulse { animation: pulse-ring 2s infinite; }
+
+/* Coin fly animation */
+@keyframes coin-fly {
+  0% { transform: translateY(0) scale(1); opacity: 1; }
+  100% { transform: translateY(-60px) scale(0.5); opacity: 0; }
+}
+.coin-fly-anim {
+  position: fixed; z-index: 9998;
+  font-size: 1.2rem; pointer-events: none;
+  animation: coin-fly 0.8s ease-out forwards;
+}
+</style>
 </head>
 <body>
-    <header>
-        <h1>Habit Tracker</h1>
-        <p>Track your daily habits and stay productive!</p>
-    </header>
 
-    <main>
-        <section id="habit-list">
-            <h2>Your Habits</h2>
-            <ul id="habits">
-                <!-- Predefined habits -->
-                <li>
-                    <input type="checkbox" class="habit-checkbox">
-                    <span>Drink 8 glasses of water</span>
-                    <button class="delete-btn">Delete</button>
-                </li>
-                <li>
-                    <input type="checkbox" class="habit-checkbox">
-                    <span>Exercise for 30 minutes</span>
-                    <button class="delete-btn">Delete</button>
-                </li>
-                <li>
-                    <input type="checkbox" class="habit-checkbox">
-                    <span>Read for 20 minutes</span>
-                    <button class="delete-btn">Delete</button>
-                </li>
-            </ul>
-        </section>
+<canvas id="particle-canvas"></canvas>
 
-        <section id="add-habit">
-            <h2>Add a New Habit</h2>
-            <form id="habit-form">
-                <label for="new-habit">New Habit:</label>
-                <input type="text" id="new-habit" placeholder="Enter a new habit">
-                <button type="submit">Add Habit</button>
-            </form>
-        </section>
-    </main>
+<!-- HEADER -->
+<header id="app-header">
+  <div class="header-brand">
+    <div class="brand-icon">⚡</div>
+    <span class="brand-name">HabitQuest</span>
+  </div>
+  <div class="header-stats">
+    <div class="stat-pill gold">
+      <span class="icon">🪙</span>
+      <span class="coin-count" id="hdr-coins">0</span>
+    </div>
+    <div class="stat-pill xp">
+      <span class="icon">⭐</span>
+      <span class="xp-count" id="hdr-xp">0 XP</span>
+    </div>
+    <div class="stat-pill streak">
+      <span class="icon">🔥</span>
+      <span class="streak-count" id="hdr-streak">0 days</span>
+    </div>
+  </div>
+</header>
 
-    <footer>
-        <p>Habit Tracker App - Debug and Improve Me!</p>
-    </footer>
+<!-- LAYOUT -->
+<div id="app-layout">
 
-    <script src="script.js"></script>
+  <!-- SIDEBAR -->
+  <aside id="sidebar">
+    <div class="player-card">
+      <div class="player-avatar" id="player-avatar">🧙</div>
+      <div class="player-name" id="player-name-display">Hero</div>
+      <div class="player-level-label">
+        Level <span id="player-level">1</span>
+        <span class="level-badge" id="level-title">Novice</span>
+      </div>
+      <div class="xp-bar-wrap">
+        <div class="xp-bar-bg">
+          <div class="xp-bar-fill" id="xp-bar" style="width:0%"></div>
+        </div>
+        <span id="xp-bar-label" style="white-space:nowrap">0 / 100</span>
+      </div>
+    </div>
+
+    <div class="nav-item active" onclick="switchView('habits',this)">
+      <span class="nav-icon">📋</span><span>Today's Habits</span>
+    </div>
+    <div class="nav-item" onclick="switchView('challenges',this)">
+      <span class="nav-icon">⚔️</span><span>Challenges</span>
+    </div>
+    <div class="nav-item" onclick="switchView('achievements',this)">
+      <span class="nav-icon">🏆</span><span>Achievements</span>
+    </div>
+
+    <div class="sidebar-section">Progression</div>
+    <div class="nav-item" onclick="switchView('stats',this)">
+      <span class="nav-icon">📊</span><span>Statistics</span>
+    </div>
+    <div class="nav-item" onclick="switchView('shop',this)">
+      <span class="nav-icon">🛍️</span><span>Reward Shop</span>
+    </div>
+  </aside>
+
+  <!-- MAIN CONTENT -->
+  <main id="main-content">
+
+    <!-- HABITS VIEW -->
+    <div class="view active" id="view-habits">
+      <div class="view-header">
+        <div>
+          <div class="view-title">Today's Habits <span id="today-date" style="color:var(--text3);font-size:1rem"></span></div>
+          <div class="view-subtitle">Complete habits to earn XP and coins</div>
+        </div>
+        <button class="btn btn-primary" onclick="document.getElementById('add-form').style.display=document.getElementById('add-form').style.display==='none'?'block':'none'">+ Add Habit</button>
+      </div>
+
+      <!-- Progress ring -->
+      <div class="daily-ring-wrap">
+        <svg class="ring-svg" width="90" height="90" viewBox="0 0 90 90">
+          <defs>
+            <linearGradient id="ringGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+              <stop offset="0%" stop-color="#a78bfa"/>
+              <stop offset="100%" stop-color="#60a5fa"/>
+            </linearGradient>
+          </defs>
+          <circle class="ring-bg" cx="45" cy="45" r="38" stroke-width="7"/>
+          <circle class="ring-fill" id="progress-ring" cx="45" cy="45" r="38" stroke-width="7"
+            stroke-dasharray="238.76" stroke-dashoffset="238.76" transform="rotate(-90 45 45)"/>
+          <text class="ring-text-pct" id="ring-pct" x="45" y="42" text-anchor="middle" dominant-baseline="middle">0%</text>
+          <text class="ring-text-label" x="45" y="55" text-anchor="middle">done</text>
+        </svg>
+        <div class="ring-info">
+          <h3 id="ring-title">Get started!</h3>
+          <p id="ring-desc">Complete your first habit to earn XP and start your streak.</p>
+        </div>
+      </div>
+
+      <!-- Overview cards -->
+      <div class="progress-overview">
+        <div class="ov-card total">
+          <div class="ov-num" id="ov-total">0</div>
+          <div class="ov-label">Total Habits</div>
+        </div>
+        <div class="ov-card done">
+          <div class="ov-num" id="ov-done">0</div>
+          <div class="ov-label">Completed</div>
+        </div>
+        <div class="ov-card pct">
+          <div class="ov-num" id="ov-pct">0%</div>
+          <div class="ov-label">Success Rate</div>
+        </div>
+      </div>
+
+      <!-- Habit list -->
+      <div class="habits-container" id="habits-list"></div>
+
+      <!-- Add habit form -->
+      <div class="add-habit-card" id="add-form" style="display:none;margin-top:1rem">
+        <h3>Add a New Habit</h3>
+        <div class="add-habit-row" style="gap:0.5rem;flex-wrap:wrap">
+          <input class="habit-input" id="new-habit-input" placeholder="e.g. Meditate for 10 minutes" maxlength="60">
+          <select class="category-select" id="habit-category">
+            <option value="health">💪 Health</option>
+            <option value="mind">🧠 Mind</option>
+            <option value="social">🤝 Social</option>
+            <option value="creative">🎨 Creative</option>
+            <option value="finance">💰 Finance</option>
+            <option value="other">⚡ Other</option>
+          </select>
+          <button class="btn btn-primary" onclick="addHabit()">Add</button>
+          <button class="btn btn-ghost" onclick="document.getElementById('add-form').style.display='none'">Cancel</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- CHALLENGES VIEW -->
+    <div class="view" id="view-challenges">
+      <div class="view-header">
+        <div>
+          <div class="view-title">Challenges</div>
+          <div class="view-subtitle">Daily & weekly quests for bonus rewards</div>
+        </div>
+      </div>
+      <div style="margin-bottom:1rem">
+        <div style="font-size:0.8rem;font-weight:600;color:var(--text2);text-transform:uppercase;letter-spacing:0.06em;margin-bottom:0.6rem">📅 Daily Challenges</div>
+        <div class="challenge-grid" id="daily-challenges-list"></div>
+      </div>
+      <div>
+        <div style="font-size:0.8rem;font-weight:600;color:var(--text2);text-transform:uppercase;letter-spacing:0.06em;margin-bottom:0.6rem">📆 Weekly Challenges</div>
+        <div class="challenge-grid" id="weekly-challenges-list"></div>
+      </div>
+    </div>
+
+    <!-- ACHIEVEMENTS VIEW -->
+    <div class="view" id="view-achievements">
+      <div class="view-header">
+        <div>
+          <div class="view-title">Achievements</div>
+          <div class="view-subtitle" id="achieve-count-label">0 unlocked</div>
+        </div>
+      </div>
+      <div class="achievements-grid" id="achievements-grid"></div>
+    </div>
+
+    <!-- STATS VIEW -->
+    <div class="view" id="view-stats">
+      <div class="view-header">
+        <div>
+          <div class="view-title">Statistics</div>
+          <div class="view-subtitle">Your progress over time</div>
+        </div>
+      </div>
+      <div class="stats-grid">
+        <div class="stat-card">
+          <div class="stat-card-num" id="st-total-done" style="color:var(--green)">0</div>
+          <div class="stat-card-label">Total Completions</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-card-num" id="st-coins" style="color:var(--gold)">0</div>
+          <div class="stat-card-label">Total Coins Earned</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-card-num" id="st-xp" style="color:var(--xp)">0</div>
+          <div class="stat-card-label">Total XP Earned</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-card-num" id="st-streak" style="color:var(--orange)">0</div>
+          <div class="stat-card-label">Best Streak</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-card-num" id="st-level" style="color:var(--blue)">1</div>
+          <div class="stat-card-label">Current Level</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-card-num" id="st-achieve" style="color:var(--pink)">0</div>
+          <div class="stat-card-label">Achievements</div>
+        </div>
+      </div>
+
+      <!-- Activity calendar -->
+      <div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-lg);padding:1.1rem;margin-bottom:1rem">
+        <div style="font-size:0.85rem;font-weight:600;margin-bottom:0.75rem">📅 Activity Calendar (Last 35 Days)</div>
+        <div style="display:flex;gap:4px;margin-bottom:4px">
+          <div class="cal-day-label" style="width:calc((100% - 24px)/7)">S</div>
+          <div class="cal-day-label" style="width:calc((100% - 24px)/7)">M</div>
+          <div class="cal-day-label" style="width:calc((100% - 24px)/7)">T</div>
+          <div class="cal-day-label" style="width:calc((100% - 24px)/7)">W</div>
+          <div class="cal-day-label" style="width:calc((100% - 24px)/7)">T</div>
+          <div class="cal-day-label" style="width:calc((100% - 24px)/7)">F</div>
+          <div class="cal-day-label" style="width:calc((100% - 24px)/7)">S</div>
+        </div>
+        <div class="calendar-grid" id="activity-calendar"></div>
+      </div>
+
+      <!-- Habit breakdown -->
+      <div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-lg);padding:1.1rem">
+        <div style="font-size:0.85rem;font-weight:600;margin-bottom:0.75rem">📈 Habit Performance</div>
+        <div id="habit-stats-breakdown"></div>
+      </div>
+    </div>
+
+    <!-- SHOP VIEW -->
+    <div class="view" id="view-shop">
+      <div class="view-header">
+        <div>
+          <div class="view-title">Reward Shop</div>
+          <div class="view-subtitle">Spend your coins on themes, avatars, and more</div>
+        </div>
+        <div style="display:flex;align-items:center;gap:6px;background:var(--bg3);border:1px solid var(--border2);border-radius:999px;padding:6px 14px">
+          <span style="color:var(--gold)">🪙</span>
+          <span style="font-weight:700;color:var(--gold)" id="shop-coins">0</span>
+        </div>
+      </div>
+      <div class="shop-tabs">
+        <div class="shop-tab active" onclick="shopTab('avatars',this)">Avatars</div>
+        <div class="shop-tab" onclick="shopTab('themes',this)">Themes</div>
+        <div class="shop-tab" onclick="shopTab('effects',this)">Effects</div>
+        <div class="shop-tab" onclick="shopTab('badges',this)">Badges</div>
+      </div>
+      <div class="shop-grid" id="shop-grid"></div>
+    </div>
+
+  </main>
+
+  <!-- RIGHT PANEL -->
+  <aside id="right-panel">
+
+    <!-- Streak -->
+    <div class="panel-section">
+      <div class="panel-title">🔥 Current Streak</div>
+      <div class="streak-display">
+        <div class="streak-flame">🔥</div>
+        <div class="streak-num" id="panel-streak">0</div>
+        <div class="streak-unit">consecutive days</div>
+      </div>
+      <div class="streak-milestones" id="streak-milestones"></div>
+    </div>
+
+    <!-- Daily quests -->
+    <div class="panel-section">
+      <div class="panel-title">📜 Daily Quests</div>
+      <div class="quest-list" id="quest-list"></div>
+    </div>
+
+    <!-- Recent activity -->
+    <div class="panel-section">
+      <div class="panel-title">⚡ Recent Activity</div>
+      <div id="activity-feed" style="display:flex;flex-direction:column;gap:0.4rem"></div>
+    </div>
+
+  </aside>
+</div>
+
+<!-- NOTIFICATIONS -->
+<div id="notif-container"></div>
+
+<!-- MODAL -->
+<div id="modal-overlay">
+  <div class="modal-box">
+    <div class="modal-emoji" id="modal-emoji">🎉</div>
+    <div class="modal-title" id="modal-title">Level Up!</div>
+    <div class="modal-sub" id="modal-sub">You reached a new level!</div>
+    <div class="modal-rewards" id="modal-rewards"></div>
+    <button class="btn btn-primary" onclick="closeModal()" style="width:100%;padding:0.7rem">Awesome! ✨</button>
+  </div>
+</div>
+
+<script>
+// ════════════════════════════════════════
+// STATE
+// ════════════════════════════════════════
+const LEVEL_TITLES = ['Novice','Apprentice','Explorer','Challenger','Warrior','Champion','Master','Legend','Mythic','Transcendent'];
+const LEVEL_XP = [0,100,250,450,700,1000,1400,1900,2500,3200];
+
+const SHOP_ITEMS = {
+  avatars: [
+    {id:'av_wizard',name:'Wizard',icon:'🧙',cost:0,desc:'Default avatar',owned:true},
+    {id:'av_knight',name:'Knight',icon:'🛡️',cost:150,desc:'Brave and bold'},
+    {id:'av_ninja',name:'Ninja',icon:'🥷',cost:200,desc:'Swift and silent'},
+    {id:'av_dragon',name:'Dragon',icon:'🐉',cost:500,desc:'Legendary power'},
+    {id:'av_robot',name:'Cyborg',icon:'🤖',cost:300,desc:'Future warrior'},
+    {id:'av_fox',name:'Fox',icon:'🦊',cost:250,desc:'Clever trickster'},
+  ],
+  themes: [
+    {id:'th_dark',name:'Midnight',icon:'🌑',cost:0,desc:'Classic dark mode',owned:true},
+    {id:'th_ocean',name:'Ocean',icon:'🌊',cost:200,desc:'Deep blue vibes'},
+    {id:'th_forest',name:'Forest',icon:'🌲',cost:200,desc:'Earthy green'},
+    {id:'th_sunset',name:'Sunset',icon:'🌅',cost:350,desc:'Warm and fiery'},
+    {id:'th_galaxy',name:'Galaxy',icon:'🌌',cost:500,desc:'Cosmic purple'},
+  ],
+  effects: [
+    {id:'ef_none',name:'None',icon:'◻️',cost:0,desc:'No special effect',owned:true},
+    {id:'ef_confetti',name:'Confetti',icon:'🎊',cost:100,desc:'Celebration burst'},
+    {id:'ef_stars',name:'Stars',icon:'⭐',cost:150,desc:'Starfall effect'},
+    {id:'ef_fireworks',name:'Fireworks',icon:'🎆',cost:300,desc:'Epic fireworks'},
+    {id:'ef_lightning',name:'Lightning',icon:'⚡',cost:250,desc:'Electric pulse'},
+  ],
+  badges: [
+    {id:'bg_flame',name:'Flame',icon:'🔥',cost:0,desc:'For consistent streaks',owned:true},
+    {id:'bg_crown',name:'Crown',icon:'👑',cost:400,desc:'Royalty status'},
+    {id:'bg_gem',name:'Gem',icon:'💎',cost:300,desc:'Precious achiever'},
+    {id:'bg_rocket',name:'Rocket',icon:'🚀',cost:200,desc:'Fast riser'},
+    {id:'bg_trophy',name:'Trophy',icon:'🏆',cost:600,desc:'Ultimate winner'},
+  ]
+};
+
+const ACHIEVEMENTS = [
+  {id:'ach_first',name:'First Step',icon:'👣',desc:'Complete your first habit',condition:s=>s.totalCompletions>=1},
+  {id:'ach_10',name:'Getting Going',icon:'⚡',desc:'Complete 10 habits total',condition:s=>s.totalCompletions>=10},
+  {id:'ach_50',name:'Habit Hero',icon:'🦸',desc:'Complete 50 habits total',condition:s=>s.totalCompletions>=50},
+  {id:'ach_streak3',name:'Hat Trick',icon:'🎩',desc:'Reach a 3-day streak',condition:s=>s.streak>=3},
+  {id:'ach_streak7',name:'Week Warrior',icon:'🗓️',desc:'7-day streak achieved',condition:s=>s.streak>=7},
+  {id:'ach_streak14',name:'Fortnight Fighter',icon:'⚔️',desc:'14-day streak!',condition:s=>s.streak>=14},
+  {id:'ach_streak30',name:'Monthly Master',icon:'🏅',desc:'30-day streak legend',condition:s=>s.streak>=30},
+  {id:'ach_level5',name:'Rising Star',icon:'🌟',desc:'Reach Level 5',condition:s=>s.level>=5},
+  {id:'ach_level10',name:'Elite',icon:'💫',desc:'Reach Level 10',condition:s=>s.level>=10},
+  {id:'ach_coins500',name:'Coin Hoarder',icon:'💰',desc:'Earn 500 total coins',condition:s=>s.totalCoinsEarned>=500},
+  {id:'ach_coins2000',name:'Treasure Hunter',icon:'🏴‍☠️',desc:'Earn 2000 total coins',condition:s=>s.totalCoinsEarned>=2000},
+  {id:'ach_all_daily',name:'Perfect Day',icon:'✨',desc:'Complete all habits in one day',condition:s=>s.hadPerfectDay},
+  {id:'ach_5habits',name:'Habit Builder',icon:'🏗️',desc:'Have 5 habits at once',condition:s=>s.habits.length>=5},
+  {id:'ach_purchase',name:'Shopper',icon:'🛍️',desc:'Buy something from the shop',condition:s=>s.totalPurchases>=1},
+  {id:'ach_10level',name:'Dedicated',icon:'🎖️',desc:'Complete any habit 10 days in a row',condition:s=>s.maxHabitStreak>=10},
+];
+
+const STREAK_MILESTONES = [
+  {days:3,reward:50,icon:'🔥',label:'3 Days'},
+  {days:7,reward:100,icon:'⚡',label:'1 Week'},
+  {days:14,reward:250,icon:'💪',label:'2 Weeks'},
+  {days:30,reward:500,icon:'🏅',label:'1 Month',special:'Special Badge'},
+  {days:50,reward:750,icon:'💎',label:'50 Days'},
+  {days:100,reward:2000,icon:'👑',label:'100 Days',special:'Legendary Achievement'},
+];
+
+const DEFAULT_HABITS = [
+  {name:'Drink 8 glasses of water',category:'health',xpReward:20,coinReward:10},
+  {name:'Exercise for 30 minutes',category:'health',xpReward:30,coinReward:15},
+  {name:'Read for 20 minutes',category:'mind',xpReward:20,coinReward:10},
+];
+
+const CATEGORY_META = {
+  health:{icon:'💪',color:'#34d399'},
+  mind:{icon:'🧠',color:'#60a5fa'},
+  social:{icon:'🤝',color:'#f472b6'},
+  creative:{icon:'🎨',color:'#a78bfa'},
+  finance:{icon:'💰',color:'#f5c842'},
+  other:{icon:'⚡',color:'#fb923c'},
+};
+
+function makeState(){
+  return {
+    coins: 0,
+    totalCoinsEarned: 0,
+    xp: 0,
+    totalXpEarned: 0,
+    level: 1,
+    streak: 0,
+    bestStreak: 0,
+    lastActiveDate: null,
+    habits: [],
+    habitStreaks: {},
+    maxHabitStreak: 0,
+    totalCompletions: 0,
+    hadPerfectDay: false,
+    unlockedAchievements: [],
+    totalPurchases: 0,
+    activeAvatar: 'av_wizard',
+    activeTheme: 'th_dark',
+    activeEffect: 'ef_none',
+    activeBadge: 'bg_flame',
+    ownedItems: ['av_wizard','th_dark','ef_none','bg_flame'],
+    activityLog: {},
+    dailyQuestsDate: null,
+    dailyQuestsCompleted: [],
+    challengesCompleted: [],
+    recentActivity: [],
+  };
+}
+
+let state;
+try {
+  const saved = localStorage.getItem('habitquest_v3');
+  state = saved ? {...makeState(), ...JSON.parse(saved)} : makeState();
+  // ensure habits have streaks
+  if(!state.habitStreaks) state.habitStreaks = {};
+  if(!state.recentActivity) state.recentActivity = [];
+  if(!state.activityLog) state.activityLog = {};
+} catch(e){ state = makeState(); }
+
+// Generate next habit ID
+let nextHabitId = (state.habits.length > 0) ? Math.max(...state.habits.map(h=>h.id||0))+1 : 1;
+
+// Daily reset check
+const todayKey = new Date().toISOString().split('T')[0];
+if(state.lastActiveDate !== todayKey){
+  // New day: uncheck all habits, update streak
+  if(state.lastActiveDate){
+    const yesterday = new Date(); yesterday.setDate(yesterday.getDate()-1);
+    const yKey = yesterday.toISOString().split('T')[0];
+    if(state.lastActiveDate === yKey){
+      state.streak++;
+    } else {
+      state.streak = 0;
+    }
+    if(state.streak > state.bestStreak) state.bestStreak = state.streak;
+    // Streak milestone bonuses
+    STREAK_MILESTONES.forEach(m=>{
+      if(state.streak === m.days){
+        state.coins += m.reward;
+        state.totalCoinsEarned += m.reward;
+        addActivity(`🎯 ${m.days}-day streak! +${m.reward} coins`);
+        showNotif('streak-bonus','🔥',`${m.days}-Day Streak!`,`+${m.reward} bonus coins!`);
+      }
+    });
+  } else {
+    state.streak = 1; // first day
+  }
+  state.habits.forEach(h=>{ h.completed = false; });
+  state.lastActiveDate = todayKey;
+  state.dailyQuestsDate = null;
+}
+
+// Daily quests
+if(state.dailyQuestsDate !== todayKey){
+  state.dailyQuestsDate = todayKey;
+  state.dailyQuestsCompleted = [];
+}
+if(!state.activityLog[todayKey]) state.activityLog[todayKey] = 0;
+
+// If no habits, add defaults
+if(state.habits.length === 0){
+  DEFAULT_HABITS.forEach(h=>{
+    state.habits.push({id:nextHabitId++,name:h.name,category:h.category,xpReward:h.xpReward,coinReward:h.coinReward,completed:false,createdAt:Date.now()});
+  });
+}
+
+const DAILY_QUESTS = [
+  {id:'dq_complete1',name:'Complete 1 habit',reward:30,icon:'⚡',target:1,get progress(){return state.habits.filter(h=>h.completed).length;}},
+  {id:'dq_complete3',name:'Complete 3 habits',reward:75,icon:'🎯',target:3,get progress(){return state.habits.filter(h=>h.completed).length;}},
+  {id:'dq_login',name:'Log in today',reward:20,icon:'📅',target:1,get progress(){return 1;}},
+];
+
+const DAILY_CHALLENGES = [
+  {id:'dc_morning',name:'Morning Kickstart',desc:'Complete 2 habits before noon',icon:'☀️',reward:50,type:'gold',target:2,get progress(){return Math.min(state.habits.filter(h=>h.completed).length,2);}},
+  {id:'dc_perfect',name:'Perfect Day',desc:'Complete all your habits today',icon:'✨',reward:150,type:'gold',target:state.habits.length||3,get progress(){return state.habits.filter(h=>h.completed).length;}},
+  {id:'dc_newhabit',name:'Expand Your Horizon',desc:'Add a new habit today',icon:'➕',reward:40,type:'xp',target:1,get progress(){return state.challengesCompleted.includes('dc_newhabit')?1:0;}},
+];
+
+const WEEKLY_CHALLENGES = [
+  {id:'wc_7days',name:'Weekly Warrior',desc:'Complete at least 1 habit every day this week',icon:'🗓️',reward:500,type:'gold',target:7,get progress(){return Math.min(state.streak,7);}},
+  {id:'wc_50total',name:'Half Century',desc:'Complete 50 habits this week',icon:'💪',reward:300,type:'xp',target:50,get progress(){return Math.min(state.totalCompletions,50);}},
+  {id:'wc_allcats',name:'Jack of All Trades',desc:'Complete habits from 3 different categories',icon:'🎭',reward:200,type:'gold',target:3,get progress(){return new Set(state.habits.filter(h=>h.completed).map(h=>h.category)).size;}},
+];
+
+// ════════════════════════════════════════
+// SAVE / RENDER HELPERS
+// ════════════════════════════════════════
+function save(){
+  try{ localStorage.setItem('habitquest_v3', JSON.stringify(state)); } catch(e){}
+}
+
+function addActivity(text){
+  state.recentActivity.unshift({text, time: Date.now()});
+  if(state.recentActivity.length > 20) state.recentActivity.pop();
+}
+
+function levelFromXp(xp){
+  let lv = 1;
+  for(let i=LEVEL_XP.length-1;i>=0;i--){ if(xp>=LEVEL_XP[i]){ lv=i+1; break; } }
+  return Math.min(lv, LEVEL_XP.length);
+}
+function xpForLevel(lv){ return LEVEL_XP[Math.min(lv-1,LEVEL_XP.length-1)]; }
+function xpForNextLevel(lv){ return LEVEL_XP[Math.min(lv,LEVEL_XP.length-1)]; }
+
+function addXp(amount, source=''){
+  const oldLevel = state.level;
+  state.xp += amount;
+  state.totalXpEarned += amount;
+  const newLevel = levelFromXp(state.xp);
+  state.level = newLevel;
+  updateXpBar();
+  updateHeader();
+  if(newLevel > oldLevel){
+    const bonusCoins = newLevel * 50;
+    state.coins += bonusCoins;
+    state.totalCoinsEarned += bonusCoins;
+    showLevelUpModal(newLevel, bonusCoins);
+    addActivity(`🎉 Reached Level ${newLevel}! +${bonusCoins} coins`);
+    save();
+  }
+}
+
+function addCoins(amount, evt){
+  state.coins += amount;
+  state.totalCoinsEarned += amount;
+  updateHeader();
+  if(evt){
+    const fly = document.createElement('div');
+    fly.className = 'coin-fly-anim';
+    fly.textContent = `+${amount}🪙`;
+    fly.style.left = (evt.clientX - 20) + 'px';
+    fly.style.top = (evt.clientY - 10) + 'px';
+    document.body.appendChild(fly);
+    setTimeout(()=>fly.remove(), 900);
+  }
+}
+
+// ════════════════════════════════════════
+// RENDER
+// ════════════════════════════════════════
+function updateHeader(){
+  document.getElementById('hdr-coins').textContent = state.coins.toLocaleString();
+  document.getElementById('hdr-xp').textContent = state.totalXpEarned.toLocaleString() + ' XP';
+  document.getElementById('hdr-streak').textContent = state.streak + ' day' + (state.streak!==1?'s':'');
+  document.getElementById('shop-coins').textContent = state.coins.toLocaleString();
+  if(document.getElementById('panel-streak')) document.getElementById('panel-streak').textContent = state.streak;
+  updateXpBar();
+  updateStreak();
+}
+
+function updateXpBar(){
+  const lv = state.level;
+  const curXp = state.xp;
+  const lvXp = xpForLevel(lv);
+  const nextXp = xpForNextLevel(lv+1);
+  const pct = lv >= LEVEL_XP.length ? 100 : Math.round(((curXp - lvXp) / (nextXp - lvXp)) * 100);
+  const bar = document.getElementById('xp-bar');
+  const label = document.getElementById('xp-bar-label');
+  const lvEl = document.getElementById('player-level');
+  const titleEl = document.getElementById('level-title');
+  if(bar) bar.style.width = pct + '%';
+  if(label) label.textContent = lv >= LEVEL_XP.length ? 'MAX' : `${curXp - lvXp} / ${nextXp - lvXp}`;
+  if(lvEl) lvEl.textContent = lv;
+  if(titleEl) titleEl.textContent = LEVEL_TITLES[Math.min(lv-1, LEVEL_TITLES.length-1)];
+  // update avatar
+  const av = SHOP_ITEMS.avatars.find(a=>a.id===state.activeAvatar);
+  const avEl = document.getElementById('player-avatar');
+  if(avEl && av) avEl.textContent = av.icon;
+}
+
+function renderHabits(){
+  const list = document.getElementById('habits-list');
+  if(!list) return;
+  list.innerHTML = '';
+  if(state.habits.length === 0){
+    list.innerHTML = '<div style="text-align:center;padding:2rem;color:var(--text3);font-size:0.9rem">No habits yet. Add your first habit above! 🌱</div>';
+  }
+  state.habits.forEach(h=>{
+    const div = document.createElement('div');
+    div.className = 'habit-item' + (h.completed?' completed':'');
+    const cat = CATEGORY_META[h.category] || CATEGORY_META.other;
+    const hs = state.habitStreaks[h.id] || 0;
+    div.innerHTML = `
+      <div class="habit-check${h.completed?' checked':''}" onclick="toggleHabit(${h.id},event)"></div>
+      <div style="width:32px;height:32px;border-radius:8px;background:${cat.color}22;display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0">${cat.icon}</div>
+      <div class="habit-info">
+        <div class="habit-name">${escHtml(h.name)}</div>
+        <div class="habit-meta">+${h.xpReward} XP · +${h.coinReward} coins</div>
+      </div>
+      ${hs>0?`<span class="habit-streak-badge">🔥 ${hs}</span>`:''}
+      <span class="habit-xp-badge">+${h.xpReward} XP</span>
+      <button class="habit-delete-btn" onclick="deleteHabit(${h.id},event)" title="Delete">✕</button>
+    `;
+    list.appendChild(div);
+  });
+  updateProgressRing();
+  updateOverviewCards();
+  renderActivityFeed();
+}
+
+function updateProgressRing(){
+  const total = state.habits.length;
+  const done = state.habits.filter(h=>h.completed).length;
+  const pct = total ? Math.round((done/total)*100) : 0;
+  const ring = document.getElementById('progress-ring');
+  const pctEl = document.getElementById('ring-pct');
+  const title = document.getElementById('ring-title');
+  const desc = document.getElementById('ring-desc');
+  const circumference = 238.76;
+  if(ring) ring.style.strokeDashoffset = circumference - (pct/100)*circumference;
+  if(pctEl) pctEl.textContent = pct + '%';
+  if(title){
+    if(pct === 0) title.textContent = 'Get started!';
+    else if(pct < 50) title.textContent = 'Good progress!';
+    else if(pct < 100) title.textContent = 'Almost there!';
+    else title.textContent = '🎉 Perfect day!';
+  }
+  if(desc){
+    if(pct === 0) desc.textContent = 'Complete your first habit to earn XP and start your streak.';
+    else if(pct < 100) desc.textContent = `${done} of ${total} habits done today. Keep going!`;
+    else desc.textContent = 'All habits complete! You earned a perfect day bonus.';
+  }
+}
+
+function updateOverviewCards(){
+  const total = state.habits.length;
+  const done = state.habits.filter(h=>h.completed).length;
+  const pct = total ? Math.round((done/total)*100) : 0;
+  document.getElementById('ov-total').textContent = total;
+  document.getElementById('ov-done').textContent = done;
+  document.getElementById('ov-pct').textContent = pct + '%';
+}
+
+function renderChallenges(){
+  const dc = document.getElementById('daily-challenges-list');
+  const wc = document.getElementById('weekly-challenges-list');
+  if(!dc||!wc) return;
+  dc.innerHTML=''; wc.innerHTML='';
+  DAILY_CHALLENGES.forEach(c=>{
+    dc.appendChild(makeChallengeCard(c));
+  });
+  WEEKLY_CHALLENGES.forEach(c=>{
+    wc.appendChild(makeChallengeCard(c));
+  });
+}
+
+function makeChallengeCard(c){
+  const progress = c.progress;
+  const target = c.target;
+  const pct = Math.min(100, Math.round((progress/Math.max(target,1))*100));
+  const isCompleted = state.challengesCompleted.includes(c.id) || progress >= target;
+  const div = document.createElement('div');
+  div.className = 'challenge-card' + (isCompleted?' completed':'');
+  div.innerHTML = `
+    <div class="challenge-icon" style="background:${c.type==='gold'?'rgba(245,200,66,0.15)':'rgba(167,139,250,0.15)'}">${c.icon}</div>
+    <div class="challenge-info">
+      <div class="challenge-name">${c.name}</div>
+      <div class="challenge-desc">${c.desc}</div>
+      <div class="challenge-progress-bar">
+        <div class="challenge-progress-fill" style="width:${pct}%"></div>
+      </div>
+      <div style="font-size:0.68rem;color:var(--text3);margin-top:3px">${progress} / ${target}</div>
+    </div>
+    <div>
+      <div class="challenge-reward ${c.type==='gold'?'reward-gold':'reward-xp'}">
+        ${c.type==='gold'?'🪙':'⭐'} ${c.reward}
+      </div>
+      ${isCompleted?'<div style="font-size:0.65rem;color:var(--green);text-align:center;margin-top:4px;font-weight:600">✓ Done</div>':''}
+    </div>
+  `;
+  // Auto-grant if completed and not yet claimed
+  if(progress >= target && !state.challengesCompleted.includes(c.id)){
+    state.challengesCompleted.push(c.id);
+    if(c.type === 'gold'){ addCoins(c.reward); showNotif('coin','🪙',`Challenge: ${c.name}`,`+${c.reward} coins earned!`); }
+    else { addXp(c.reward,'challenge'); showNotif('xp','⭐',`Challenge: ${c.name}`,`+${c.reward} XP earned!`); }
+    save();
+  }
+  return div;
+}
+
+function renderAchievements(){
+  const grid = document.getElementById('achievements-grid');
+  if(!grid) return;
+  grid.innerHTML = '';
+  let unlocked = 0;
+  ACHIEVEMENTS.forEach(a=>{
+    const isUnlocked = state.unlockedAchievements.includes(a.id) || a.condition(state);
+    if(isUnlocked && !state.unlockedAchievements.includes(a.id)){
+      state.unlockedAchievements.push(a.id);
+      showNotif('achieve','🏆','Achievement Unlocked!',a.name + ': ' + a.desc);
+      addActivity(`🏆 Unlocked: ${a.name}`);
+      save();
+    }
+    if(isUnlocked) unlocked++;
+    const div = document.createElement('div');
+    div.className = 'achievement-card ' + (isUnlocked?'unlocked':'locked');
+    div.innerHTML = `
+      <div class="achievement-icon">${a.icon}</div>
+      <div>
+        <div class="achievement-name">${a.name}</div>
+        <div class="achievement-desc">${a.desc}</div>
+        ${isUnlocked?'<div class="achievement-unlocked-label">✓ Unlocked</div>':''}
+      </div>
+    `;
+    grid.appendChild(div);
+  });
+  const lbl = document.getElementById('achieve-count-label');
+  if(lbl) lbl.textContent = `${unlocked} / ${ACHIEVEMENTS.length} unlocked`;
+  const stEl = document.getElementById('st-achieve');
+  if(stEl) stEl.textContent = unlocked;
+}
+
+function renderShop(category='avatars'){
+  const grid = document.getElementById('shop-grid');
+  if(!grid) return;
+  grid.innerHTML = '';
+  const items = SHOP_ITEMS[category] || [];
+  items.forEach(item=>{
+    const owned = state.ownedItems.includes(item.id) || item.owned;
+    const isActive = state['active'+category.slice(0,-1).charAt(0).toUpperCase()+category.slice(1,-1)] === item.id
+                  || state['active'+capitalizeFirst(category.replace(/s$/,''))] === item.id;
+    const div = document.createElement('div');
+    div.className = 'shop-item' + (owned?' owned':'') + (isActive?' active-item':'');
+    div.innerHTML = `
+      <div class="shop-item-icon">${item.icon}</div>
+      <div class="shop-item-name">${item.name}</div>
+      <div class="shop-item-desc">${item.desc}</div>
+      ${owned
+        ? `<div class="shop-item-owned">✓ ${isActive?'Active':'Owned'}</div>`
+        : `<div class="shop-item-price">🪙 ${item.cost}</div>`}
+    `;
+    div.addEventListener('click',()=>handleShopClick(item, category, owned));
+    grid.appendChild(div);
+  });
+}
+
+function capitalizeFirst(s){ return s.charAt(0).toUpperCase()+s.slice(1); }
+
+function handleShopClick(item, category, owned){
+  if(owned || state.ownedItems.includes(item.id)){
+    // Equip
+    const activeKey = 'active' + capitalizeFirst(category.replace(/s$/,''));
+    state[activeKey] = item.id;
+    save(); renderShop(category); updateXpBar();
+    showNotif('xp',item.icon,'Equipped!',`${item.name} is now active`);
+    return;
+  }
+  if(state.coins < item.cost){
+    showNotif('coin','🪙','Not enough coins',`Need ${item.cost - state.coins} more coins`);
+    return;
+  }
+  state.coins -= item.cost;
+  state.ownedItems.push(item.id);
+  state.totalPurchases++;
+  const activeKey = 'active' + capitalizeFirst(category.replace(/s$/,''));
+  state[activeKey] = item.id;
+  addActivity(`🛍️ Purchased ${item.name}`);
+  showNotif('achieve',item.icon,'Item Purchased!',`${item.name} equipped`);
+  save(); renderShop(category); updateHeader();
+  checkAchievements();
+}
+
+function shopTab(cat, el){
+  document.querySelectorAll('.shop-tab').forEach(t=>t.classList.remove('active'));
+  el.classList.add('active');
+  renderShop(cat);
+}
+
+function updateStreak(){
+  const el = document.getElementById('panel-streak');
+  if(el) el.textContent = state.streak;
+  renderStreakMilestones();
+}
+
+function renderStreakMilestones(){
+  const el = document.getElementById('streak-milestones');
+  if(!el) return;
+  el.innerHTML = '';
+  STREAK_MILESTONES.forEach(m=>{
+    const reached = state.streak >= m.days || state.bestStreak >= m.days;
+    const div = document.createElement('div');
+    div.className = 'milestone-row' + (reached?' reached':'');
+    div.innerHTML = `
+      <div class="milestone-left">
+        <span class="milestone-icon">${m.icon}</span>
+        <span style="font-size:0.78rem">${m.label}</span>
+      </div>
+      <div style="display:flex;align-items:center;gap:6px">
+        <span class="milestone-reward">🪙 ${m.reward}</span>
+        ${reached?'<span class="milestone-reached-badge">✓</span>':''}
+      </div>
+    `;
+    el.appendChild(div);
+  });
+}
+
+function renderDailyQuests(){
+  const el = document.getElementById('quest-list');
+  if(!el) return;
+  el.innerHTML = '';
+  DAILY_QUESTS.forEach(q=>{
+    const isComplete = q.progress >= q.target;
+    const alreadyClaimed = state.dailyQuestsCompleted.includes(q.id);
+    if(isComplete && !alreadyClaimed){
+      state.dailyQuestsCompleted.push(q.id);
+      addCoins(q.reward);
+      showNotif('coin','📜',`Quest: ${q.name}`,`+${q.reward} coins!`);
+      save();
+    }
+    const div = document.createElement('div');
+    div.className = 'quest-item' + ((isComplete||alreadyClaimed)?' completed':'');
+    div.innerHTML = `
+      <div class="quest-check${(isComplete||alreadyClaimed)?' done':''}"></div>
+      <div class="quest-name">${q.icon} ${q.name}</div>
+      <div class="quest-reward">🪙${q.reward}</div>
+    `;
+    el.appendChild(div);
+  });
+}
+
+function renderActivityFeed(){
+  const el = document.getElementById('activity-feed');
+  if(!el) return;
+  el.innerHTML = '';
+  const items = state.recentActivity.slice(0,8);
+  if(items.length === 0){
+    el.innerHTML = '<div style="font-size:0.78rem;color:var(--text3)">No activity yet today.</div>';
+    return;
+  }
+  items.forEach(item=>{
+    const div = document.createElement('div');
+    div.style.cssText = 'font-size:0.75rem;color:var(--text2);padding:4px 0;border-bottom:1px solid var(--border);';
+    div.textContent = item.text;
+    el.appendChild(div);
+  });
+}
+
+function renderStats(){
+  document.getElementById('st-total-done').textContent = state.totalCompletions;
+  document.getElementById('st-coins').textContent = state.totalCoinsEarned.toLocaleString();
+  document.getElementById('st-xp').textContent = state.totalXpEarned.toLocaleString();
+  document.getElementById('st-streak').textContent = state.bestStreak;
+  document.getElementById('st-level').textContent = state.level;
+  renderActivityCalendar();
+  renderHabitStatsBreakdown();
+}
+
+function renderActivityCalendar(){
+  const el = document.getElementById('activity-calendar');
+  if(!el) return;
+  el.innerHTML = '';
+  const today = new Date();
+  for(let i=34; i>=0; i--){
+    const d = new Date(today);
+    d.setDate(d.getDate()-i);
+    const key = d.toISOString().split('T')[0];
+    const isToday = (i===0);
+    const hasActivity = state.activityLog[key] && state.activityLog[key] > 0;
+    const div = document.createElement('div');
+    div.className = 'cal-day' + (hasActivity?' active-day':'') + (isToday?' today':'');
+    div.title = key + (hasActivity?` (${state.activityLog[key]} completions)`:'');
+    el.appendChild(div);
+  }
+}
+
+function renderHabitStatsBreakdown(){
+  const el = document.getElementById('habit-stats-breakdown');
+  if(!el) return;
+  if(state.habits.length === 0){ el.innerHTML = '<div style="color:var(--text3);font-size:0.85rem">Add habits to see stats.</div>'; return; }
+  el.innerHTML = '';
+  state.habits.forEach(h=>{
+    const hs = state.habitStreaks[h.id] || 0;
+    const cat = CATEGORY_META[h.category] || CATEGORY_META.other;
+    const row = document.createElement('div');
+    row.style.cssText = 'display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid var(--border)';
+    row.innerHTML = `
+      <span style="font-size:18px">${cat.icon}</span>
+      <div style="flex:1">
+        <div style="font-size:0.83rem;font-weight:500">${escHtml(h.name)}</div>
+        <div style="font-size:0.7rem;color:var(--text3)">Streak: ${hs} days</div>
+      </div>
+      ${hs>0?`<span style="font-size:0.72rem;color:var(--orange);font-weight:600">🔥 ${hs}</span>`:''}
+    `;
+    el.appendChild(row);
+  });
+}
+
+// ════════════════════════════════════════
+// INTERACTIONS
+// ════════════════════════════════════════
+function toggleHabit(id, evt){
+  const habit = state.habits.find(h=>h.id===id);
+  if(!habit) return;
+  habit.completed = !habit.completed;
+
+  if(habit.completed){
+    // Award XP + coins
+    addXp(habit.xpReward, 'habit');
+    addCoins(habit.coinReward, evt);
+    state.totalCompletions++;
+    state.activityLog[todayKey] = (state.activityLog[todayKey]||0)+1;
+
+    // Habit streak
+    state.habitStreaks[id] = (state.habitStreaks[id]||0)+1;
+    if(state.habitStreaks[id] > state.maxHabitStreak) state.maxHabitStreak = state.habitStreaks[id];
+
+    showNotif('xp','⭐','Habit Complete!',`+${habit.xpReward} XP · +${habit.coinReward} coins`);
+    addActivity(`✅ ${habit.name}`);
+    triggerEffect(evt);
+
+    // Check perfect day
+    if(state.habits.every(h=>h.completed)){
+      state.hadPerfectDay = true;
+      addCoins(50);
+      showNotif('achieve','✨','Perfect Day!','+50 bonus coins for all habits complete!');
+      launchConfetti();
+    }
+  } else {
+    // Uncheck: revert but don't decrement totals
+    state.habitStreaks[id] = Math.max(0,(state.habitStreaks[id]||1)-1);
+    addActivity(`↩ Unchecked: ${habit.name}`);
+  }
+
+  save();
+  renderHabits();
+  renderDailyQuests();
+  renderChallenges();
+  checkAchievements();
+  updateHeader();
+}
+
+function deleteHabit(id, evt){
+  evt.stopPropagation();
+  state.habits = state.habits.filter(h=>h.id!==id);
+  save();
+  renderHabits();
+  renderDailyQuests();
+}
+
+function addHabit(){
+  const input = document.getElementById('new-habit-input');
+  const cat = document.getElementById('habit-category');
+  const name = input.value.trim();
+  if(!name){ input.focus(); return; }
+  const catMeta = CATEGORY_META[cat.value] || CATEGORY_META.other;
+  const xp = cat.value === 'health' ? 30 : cat.value === 'mind' ? 25 : 20;
+  const coins = Math.round(xp * 0.5);
+  state.habits.push({
+    id: nextHabitId++,
+    name,
+    category: cat.value,
+    xpReward: xp,
+    coinReward: coins,
+    completed: false,
+    createdAt: Date.now()
+  });
+  input.value = '';
+  document.getElementById('add-form').style.display = 'none';
+  // Mark dc_newhabit as completed
+  if(!state.challengesCompleted.includes('dc_newhabit')){
+    state.challengesCompleted.push('dc_newhabit');
+    addCoins(40);
+    showNotif('coin','➕','New Habit Added!','+40 coins for expanding your routine');
+  }
+  save();
+  renderHabits();
+  renderDailyQuests();
+  renderChallenges();
+  checkAchievements();
+  addActivity(`➕ Added habit: ${name}`);
+}
+
+function checkAchievements(){
+  ACHIEVEMENTS.forEach(a=>{
+    if(!state.unlockedAchievements.includes(a.id) && a.condition(state)){
+      state.unlockedAchievements.push(a.id);
+      showNotif('achieve','🏆','Achievement Unlocked!',a.name + ': ' + a.desc);
+      addCoins(100);
+      addActivity(`🏆 Unlocked: ${a.name}`);
+    }
+  });
+  save();
+  if(document.getElementById('view-achievements').classList.contains('active')) renderAchievements();
+}
+
+// ════════════════════════════════════════
+// UI / NAVIGATION
+// ════════════════════════════════════════
+function switchView(name, el){
+  document.querySelectorAll('.view').forEach(v=>v.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
+  document.getElementById('view-'+name).classList.add('active');
+  if(el) el.classList.add('active');
+  if(name==='challenges') renderChallenges();
+  if(name==='achievements') renderAchievements();
+  if(name==='shop') renderShop('avatars');
+  if(name==='stats') renderStats();
+}
+
+// ════════════════════════════════════════
+// NOTIFICATIONS
+// ════════════════════════════════════════
+function showNotif(type, icon, title, sub){
+  const el = document.createElement('div');
+  el.className = `notif ${type}`;
+  el.innerHTML = `<span class="notif-icon">${icon}</span><div class="notif-text"><div class="notif-title">${title}</div><div class="notif-sub">${sub}</div></div>`;
+  const container = document.getElementById('notif-container');
+  container.appendChild(el);
+  setTimeout(()=>{
+    el.classList.add('fade-out');
+    setTimeout(()=>el.remove(), 300);
+  }, 3000);
+}
+
+// ════════════════════════════════════════
+// MODALS
+// ════════════════════════════════════════
+function showLevelUpModal(level, bonusCoins){
+  const title = LEVEL_TITLES[Math.min(level-1,LEVEL_TITLES.length-1)];
+  document.getElementById('modal-emoji').textContent = '🎉';
+  document.getElementById('modal-title').textContent = `Level ${level}: ${title}!`;
+  document.getElementById('modal-sub').textContent = 'You leveled up and earned bonus rewards!';
+  document.getElementById('modal-rewards').innerHTML = `
+    <div class="modal-reward-pill">⭐ Level ${level}</div>
+    <div class="modal-reward-pill">🪙 +${bonusCoins} coins</div>
+  `;
+  document.getElementById('modal-overlay').classList.add('visible');
+  launchConfetti();
+}
+
+function closeModal(){
+  document.getElementById('modal-overlay').classList.remove('visible');
+}
+
+// ════════════════════════════════════════
+// PARTICLE EFFECTS
+// ════════════════════════════════════════
+const canvas = document.getElementById('particle-canvas');
+const ctx = canvas.getContext('2d');
+let particles = [];
+let animFrame = null;
+
+function resizeCanvas(){
+  canvas.width = window.innerWidth;
+  canvas.height = window.innerHeight;
+}
+resizeCanvas();
+window.addEventListener('resize', resizeCanvas);
+
+function launchConfetti(){
+  const colors = ['#f5c842','#a78bfa','#60a5fa','#34d399','#fb923c','#f472b6'];
+  for(let i=0;i<80;i++){
+    particles.push({
+      x: Math.random()*canvas.width,
+      y: -10,
+      vx: (Math.random()-0.5)*4,
+      vy: Math.random()*4+2,
+      color: colors[Math.floor(Math.random()*colors.length)],
+      size: Math.random()*6+3,
+      rot: Math.random()*360,
+      rotV: (Math.random()-0.5)*8,
+      life: 1,
+    });
+  }
+  if(!animFrame) animateParticles();
+}
+
+function triggerEffect(evt){
+  const ef = state.activeEffect;
+  if(ef==='ef_stars'||ef==='ef_fireworks'||ef==='ef_lightning'){
+    const colors = ef==='ef_stars'?['#f5c842','#fff']:ef==='ef_fireworks'?['#f5c842','#f472b6','#60a5fa','#34d399']:['#a78bfa','#60a5fa'];
+    const x = evt ? evt.clientX : canvas.width/2;
+    const y = evt ? evt.clientY : canvas.height/2;
+    for(let i=0;i<25;i++){
+      const angle = Math.random()*Math.PI*2;
+      const speed = Math.random()*5+2;
+      particles.push({
+        x, y,
+        vx: Math.cos(angle)*speed,
+        vy: Math.sin(angle)*speed - 2,
+        color: colors[Math.floor(Math.random()*colors.length)],
+        size: Math.random()*5+2,
+        rot: 0, rotV: 0, life: 1,
+      });
+    }
+    if(!animFrame) animateParticles();
+  } else if(ef==='ef_confetti'){
+    launchConfetti();
+  }
+}
+
+function animateParticles(){
+  ctx.clearRect(0,0,canvas.width,canvas.height);
+  particles = particles.filter(p=>p.life>0.01);
+  particles.forEach(p=>{
+    ctx.save();
+    ctx.globalAlpha = p.life;
+    ctx.fillStyle = p.color;
+    ctx.translate(p.x, p.y);
+    ctx.rotate(p.rot*Math.PI/180);
+    ctx.fillRect(-p.size/2,-p.size/2,p.size,p.size);
+    ctx.restore();
+    p.x += p.vx; p.y += p.vy; p.vy += 0.12;
+    p.rot += p.rotV; p.life -= 0.015;
+  });
+  if(particles.length > 0){ animFrame = requestAnimationFrame(animateParticles); }
+  else { animFrame = null; ctx.clearRect(0,0,canvas.width,canvas.height); }
+}
+
+// ════════════════════════════════════════
+// UTILS
+// ════════════════════════════════════════
+function escHtml(s){ const d=document.createElement('div');d.textContent=s;return d.innerHTML; }
+
+// ════════════════════════════════════════
+// INIT
+// ════════════════════════════════════════
+function init(){
+  // Set today's date
+  const dateEl = document.getElementById('today-date');
+  if(dateEl){
+    const opts = {weekday:'short',month:'short',day:'numeric'};
+    dateEl.textContent = new Date().toLocaleDateString(undefined, opts);
+  }
+
+  updateHeader();
+  renderHabits();
+  renderDailyQuests();
+  renderStreakMilestones();
+  renderActivityFeed();
+  checkAchievements();
+  save();
+
+  // Welcome notification
+  setTimeout(()=>{
+    showNotif('xp','⚡','Welcome to HabitQuest!','Build habits, earn XP, level up your life.');
+  }, 500);
+
+  // Daily login bonus
+  const loginKey = 'hq_login_' + todayKey;
+  if(!localStorage.getItem(loginKey)){
+    localStorage.setItem(loginKey,'1');
+    setTimeout(()=>{
+      addCoins(25);
+      showNotif('coin','📅','Daily Login!','+25 coins for logging in today');
+      addActivity('📅 Daily login bonus: +25 coins');
+      save();
+      renderDailyQuests();
+      updateHeader();
+    }, 1200);
+  }
+}
+
+document.getElementById('new-habit-input').addEventListener('keydown',e=>{
+  if(e.key==='Enter') addHabit();
+});
+
+init();
+</script>
 </body>
 </html>
