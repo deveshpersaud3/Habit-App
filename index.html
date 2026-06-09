@@ -128,109 +128,6 @@ h1,h2,h3,h4 { font-family: 'Space Grotesk', sans-serif; }
 .landing-title { font-size: clamp(2.4rem, 5vw, 4.2rem); line-height: 1.02; margin-bottom: 1rem; }
 .landing-subtitle { font-size: 1rem; max-width: 620px; line-height: 1.75; color: var(--text2); margin-bottom: 1.8rem; }
 .landing-actions { display: flex; flex-wrap: wrap; gap: 0.9rem; margin-bottom: 1.75rem; }
-.landing-actions .btn { min-width: 160px; }
-.landing-stats {
-  display: grid;
-  grid-template-columns: repeat(3, minmax(120px, 1fr));
-  gap: 0.85rem;
-}
-.landing-stat {
-  background: rgba(255,255,255,0.04);
-  border: 1px solid rgba(255,255,255,0.06);
-  border-radius: var(--radius);
-  padding: 1rem;
-  text-align: center;
-}
-.landing-stat strong { display: block; font-size: 1.25rem; margin-bottom: 0.25rem; color: var(--text); }
-.landing-stat span { color: var(--text2); font-size: 0.82rem; }
-.landing-preview { display: grid; gap: 1rem; }
-.preview-card {
-  background: linear-gradient(180deg, rgba(22,26,52,0.98), rgba(18,21,44,0.98));
-  border: 1px solid rgba(255,255,255,0.08);
-  border-radius: var(--radius-lg);
-  padding: 1.35rem;
-  box-shadow: 0 30px 80px rgba(0,0,0,0.18);
-}
-.preview-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 1.1rem; }
-.preview-panel { display: grid; gap: 0.8rem; }
-.preview-panel-item {
-  background: var(--bg3);
-  border: 1px solid var(--border);
-  border-radius: var(--radius-sm);
-  padding: 0.9rem 1rem;
-}
-.preview-panel-item strong { display: block; margin-bottom: 0.25rem; font-size: 0.92rem; }
-.preview-panel-item span { color: var(--text3); font-size: 0.78rem; }
-.landing-features {
-  display: grid;
-  grid-template-columns: repeat(3, minmax(220px, 1fr));
-  gap: 1rem;
-  margin-top: 1.5rem;
-}
-.feature-card {
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: var(--radius-lg);
-  padding: 1.25rem;
-  display: flex;
-  flex-direction: column;
-  gap: 0.6rem;
-}
-.feature-icon {
-  width: 42px;
-  height: 42px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border-radius: 14px;
-  background: rgba(167,139,250,0.12);
-  font-size: 1.2rem;
-}
-.feature-title { font-size: 1rem; font-weight: 700; }
-.feature-desc { color: var(--text2); font-size: 0.88rem; line-height: 1.6; }
-@media (max-width: 960px) {
-  .landing-hero { grid-template-columns: 1fr; padding: 1.6rem; }
-  .landing-stat { padding: 0.9rem; }
-  .landing-features { grid-template-columns: 1fr; }
-}
-@media (max-width: 680px) {
-  #landing-page { padding: 1rem; margin-top: 0.8rem; }
-  .landing-actions { flex-direction: column; align-items: stretch; }
-  .landing-stats { grid-template-columns: 1fr; }
-}
-
-.header-brand {
-  display: flex; align-items: center; gap: 10px;
-}
-.brand-icon {
-  width: 34px; height: 34px;
-  background: linear-gradient(135deg, var(--xp), var(--gold));
-  border-radius: 9px;
-  display: flex; align-items: center; justify-content: center;
-  font-size: 18px;
-}
-.brand-name {
-  font-family: 'Space Grotesk', sans-serif;
-  font-size: 1.1rem; font-weight: 700;
-  background: linear-gradient(90deg, var(--xp), var(--gold));
-  -webkit-background-clip: text; -webkit-text-fill-color: transparent;
-}
-
-.header-stats {
-  display: flex; align-items: center; gap: 0.75rem; flex-wrap: wrap;
-}
-
-.stat-pill {
-  display: flex; align-items: center; gap: 6px;
-  background: var(--bg3);
-  border: 1px solid var(--border);
-  border-radius: 999px;
-  padding: 5px 12px;
-  font-size: 0.82rem; font-weight: 500;
-  cursor: default;
-  transition: border-color 0.2s;
-}
-.stat-pill:hover { border-color: var(--border2); }
 .stat-pill .icon { font-size: 14px; }
 .stat-pill.gold .icon { color: var(--gold); }
 .stat-pill.xp .icon { color: var(--xp); }
@@ -1221,20 +1118,115 @@ const SHOP_ITEMS = {
 
 const ACHIEVEMENTS = [
   {id:'ach_first',name:'First Step',icon:'👣',desc:'Complete your first habit',condition:s=>s.totalCompletions>=1},
+  {id:'ach_5',name:'Momentum Starter',icon:'🚶',desc:'Complete 5 habits total',condition:s=>s.totalCompletions>=5},
   {id:'ach_10',name:'Getting Going',icon:'⚡',desc:'Complete 10 habits total',condition:s=>s.totalCompletions>=10},
+  {id:'ach_20',name:'Habit Trainee',icon:'🛡️',desc:'Complete 20 habits total',condition:s=>s.totalCompletions>=20},
+  {id:'ach_30',name:'Consistency Seeker',icon:'🧭',desc:'Complete 30 habits total',condition:s=>s.totalCompletions>=30},
   {id:'ach_50',name:'Habit Hero',icon:'🦸',desc:'Complete 50 habits total',condition:s=>s.totalCompletions>=50},
+  {id:'ach_75',name:'Routine Rider',icon:'🏇',desc:'Complete 75 habits total',condition:s=>s.totalCompletions>=75},
+  {id:'ach_100',name:'Century Club',icon:'💯',desc:'Complete 100 habits total',condition:s=>s.totalCompletions>=100},
+  {id:'ach_200',name:'Legendary Habit',icon:'👑',desc:'Complete 200 habits total',condition:s=>s.totalCompletions>=200},
+
+  {id:'ach_streak1',name:'Day One',icon:'🌙',desc:'Keep a 1-day streak',condition:s=>s.streak>=1},
   {id:'ach_streak3',name:'Hat Trick',icon:'🎩',desc:'Reach a 3-day streak',condition:s=>s.streak>=3},
+  {id:'ach_streak5',name:'Rising Flame',icon:'🔥',desc:'Reach a 5-day streak',condition:s=>s.streak>=5},
   {id:'ach_streak7',name:'Week Warrior',icon:'🗓️',desc:'7-day streak achieved',condition:s=>s.streak>=7},
+  {id:'ach_streak10',name:'Tenacious',icon:'💪',desc:'Reach a 10-day streak',condition:s=>s.streak>=10},
   {id:'ach_streak14',name:'Fortnight Fighter',icon:'⚔️',desc:'14-day streak!',condition:s=>s.streak>=14},
+  {id:'ach_streak21',name:'Three-Week Titan',icon:'🏔️',desc:'Reach a 21-day streak',condition:s=>s.streak>=21},
   {id:'ach_streak30',name:'Monthly Master',icon:'🏅',desc:'30-day streak legend',condition:s=>s.streak>=30},
+  {id:'ach_streak50',name:'Streak Sovereign',icon:'👑',desc:'Reach a 50-day streak',condition:s=>s.streak>=50},
+  {id:'ach_streak75',name:'Unbroken Drive',icon:'✨',desc:'Reach a 75-day streak',condition:s=>s.streak>=75},
+  {id:'ach_streak100',name:'Century Streak',icon:'🏆',desc:'Reach a 100-day streak',condition:s=>s.streak>=100},
+
+  {id:'ach_level2',name:'Apprentice',icon:'🪄',desc:'Reach Level 2',condition:s=>s.level>=2},
+  {id:'ach_level3',name:'Progress Seeker',icon:'⚜️',desc:'Reach Level 3',condition:s=>s.level>=3},
+  {id:'ach_level4',name:'Momentum Maker',icon:'🚀',desc:'Reach Level 4',condition:s=>s.level>=4},
   {id:'ach_level5',name:'Rising Star',icon:'🌟',desc:'Reach Level 5',condition:s=>s.level>=5},
-  {id:'ach_level10',name:'Elite',icon:'💫',desc:'Reach Level 10',condition:s=>s.level>=10},
-  {id:'ach_coins500',name:'Coin Hoarder',icon:'💰',desc:'Earn 500 total coins',condition:s=>s.totalCoinsEarned>=500},
+  {id:'ach_level6',name:'Champion',icon:'🏹',desc:'Reach Level 6',condition:s=>s.level>=6},
+  {id:'ach_level7',name:'Elite',icon:'💫',desc:'Reach Level 7',condition:s=>s.level>=7},
+  {id:'ach_level8',name:'Veteran',icon:'🥷',desc:'Reach Level 8',condition:s=>s.level>=8},
+  {id:'ach_level9',name:'Legend',icon:'🦁',desc:'Reach Level 9',condition:s=>s.level>=9},
+  {id:'ach_level10',name:'Transcendent',icon:'🌌',desc:'Reach Level 10',condition:s=>s.level>=10},
+  {id:'ach_level11',name:'Mythic',icon:'🏔️',desc:'Reach Level 11',condition:s=>s.level>=11},
+
+  {id:'ach_coins50',name:'Bronze Hoarder',icon:'🪙',desc:'Earn 50 total coins',condition:s=>s.totalCoinsEarned>=50},
+  {id:'ach_coins100',name:'Coin Collector',icon:'🪙',desc:'Earn 100 total coins',condition:s=>s.totalCoinsEarned>=100},
+  {id:'ach_coins200',name:'Gold Grabber',icon:'🥇',desc:'Earn 200 total coins',condition:s=>s.totalCoinsEarned>=200},
+  {id:'ach_coins400',name:'Treasure Seeker',icon:'📦',desc:'Earn 400 total coins',condition:s=>s.totalCoinsEarned>=400},
+  {id:'ach_coins600',name:'Silver Stash',icon:'💰',desc:'Earn 600 total coins',condition:s=>s.totalCoinsEarned>=600},
+  {id:'ach_coins1000',name:'Vault Keeper',icon:'🏛️',desc:'Earn 1000 total coins',condition:s=>s.totalCoinsEarned>=1000},
+  {id:'ach_coins1500',name:'Rich Explorer',icon:'🧭',desc:'Earn 1500 total coins',condition:s=>s.totalCoinsEarned>=1500},
   {id:'ach_coins2000',name:'Treasure Hunter',icon:'🏴‍☠️',desc:'Earn 2000 total coins',condition:s=>s.totalCoinsEarned>=2000},
-  {id:'ach_all_daily',name:'Perfect Day',icon:'✨',desc:'Complete all habits in one day',condition:s=>s.hadPerfectDay},
-  {id:'ach_5habits',name:'Habit Builder',icon:'🏗️',desc:'Have 5 habits at once',condition:s=>s.habits.length>=5},
-  {id:'ach_purchase',name:'Shopper',icon:'🛍️',desc:'Buy something from the shop',condition:s=>s.totalPurchases>=1},
-  {id:'ach_10level',name:'Dedicated',icon:'🎖️',desc:'Complete any habit 10 days in a row',condition:s=>s.maxHabitStreak>=10},
+  {id:'ach_coins3000',name:'Gold Rush',icon:'🌟',desc:'Earn 3000 total coins',condition:s=>s.totalCoinsEarned>=3000},
+  {id:'ach_coins5000',name:'Coin Monarch',icon:'👑',desc:'Earn 5000 total coins',condition:s=>s.totalCoinsEarned>=5000},
+
+  {id:'ach_xp50',name:'XP Starter',icon:'⭐',desc:'Earn 50 total XP',condition:s=>s.totalXpEarned>=50},
+  {id:'ach_xp100',name:'Star Chaser',icon:'🌠',desc:'Earn 100 total XP',condition:s=>s.totalXpEarned>=100},
+  {id:'ach_xp200',name:'Experience Seeker',icon:'🧠',desc:'Earn 200 total XP',condition:s=>s.totalXpEarned>=200},
+  {id:'ach_xp400',name:'Master Novice',icon:'🏅',desc:'Earn 400 total XP',condition:s=>s.totalXpEarned>=400},
+  {id:'ach_xp700',name:'Level Grinder',icon:'⚙️',desc:'Earn 700 total XP',condition:s=>s.totalXpEarned>=700},
+  {id:'ach_xp1100',name:'XP Master',icon:'💥',desc:'Earn 1100 total XP',condition:s=>s.totalXpEarned>=1100},
+  {id:'ach_xp1600',name:'Power Leveler',icon:'🌀',desc:'Earn 1600 total XP',condition:s=>s.totalXpEarned>=1600},
+  {id:'ach_xp2200',name:'Journey Leader',icon:'🚩',desc:'Earn 2200 total XP',condition:s=>s.totalXpEarned>=2200},
+  {id:'ach_xp3000',name:'Ascended',icon:'⛰️',desc:'Earn 3000 total XP',condition:s=>s.totalXpEarned>=3000},
+  {id:'ach_xp4500',name:'Legendary XP',icon:'🏆',desc:'Earn 4500 total XP',condition:s=>s.totalXpEarned>=4500},
+
+  {id:'ach_habits1',name:'Habit Seed',icon:'🌱',desc:'Have 1 habit at once',condition:s=>s.habits.length>=1},
+  {id:'ach_habits3',name:'Habit Cluster',icon:'🌿',desc:'Have 3 habits at once',condition:s=>s.habits.length>=3},
+  {id:'ach_habits5',name:'Habit Builder',icon:'🏗️',desc:'Have 5 habits at once',condition:s=>s.habits.length>=5},
+  {id:'ach_habits7',name:'Routine Maker',icon:'🧩',desc:'Have 7 habits at once',condition:s=>s.habits.length>=7},
+  {id:'ach_habits10',name:'Routine Architect',icon:'🏛️',desc:'Have 10 habits at once',condition:s=>s.habits.length>=10},
+  {id:'ach_habits12',name:'Habit Vault',icon:'📚',desc:'Have 12 habits at once',condition:s=>s.habits.length>=12},
+  {id:'ach_habits15',name:'Habit Hoarder',icon:'🧳',desc:'Have 15 habits at once',condition:s=>s.habits.length>=15},
+  {id:'ach_habits18',name:'Lifestyle Artist',icon:'🎨',desc:'Have 18 habits at once',condition:s=>s.habits.length>=18},
+  {id:'ach_habits20',name:'Routine Champion',icon:'🏆',desc:'Have 20 habits at once',condition:s=>s.habits.length>=20},
+  {id:'ach_habits25',name:'Habit Mastery',icon:'🧠',desc:'Have 25 habits at once',condition:s=>s.habits.length>=25},
+
+  {id:'ach_ownitems4',name:'Starter Collector',icon:'🎁',desc:'Own 4 shop items',condition:s=>s.ownedItems.length>=4},
+  {id:'ach_ownitems5',name:'Item Explorer',icon:'🛍️',desc:'Own 5 shop items',condition:s=>s.ownedItems.length>=5},
+  {id:'ach_ownitems6',name:'Style Seeker',icon:'🎨',desc:'Own 6 shop items',condition:s=>s.ownedItems.length>=6},
+  {id:'ach_ownitems7',name:'Collectible Hunter',icon:'🔍',desc:'Own 7 shop items',condition:s=>s.ownedItems.length>=7},
+  {id:'ach_ownitems8',name:'Treasure Taker',icon:'💎',desc:'Own 8 shop items',condition:s=>s.ownedItems.length>=8},
+  {id:'ach_ownitems9',name:'Badge Chaser',icon:'🏅',desc:'Own 9 shop items',condition:s=>s.ownedItems.length>=9},
+  {id:'ach_ownitems10',name:'Style Lord',icon:'👑',desc:'Own 10 shop items',condition:s=>s.ownedItems.length>=10},
+  {id:'ach_ownitems12',name:'Curated Wardrobe',icon:'👗',desc:'Own 12 shop items',condition:s=>s.ownedItems.length>=12},
+  {id:'ach_ownitems15',name:'Ultimate Collector',icon:'🧾',desc:'Own 15 shop items',condition:s=>s.ownedItems.length>=15},
+  {id:'ach_ownitems20',name:'Museum Keeper',icon:'🏛️',desc:'Own 20 shop items',condition:s=>s.ownedItems.length>=20},
+
+  {id:'ach_purchase1',name:'Shopper',icon:'🛍️',desc:'Buy something from the shop',condition:s=>s.totalPurchases>=1},
+  {id:'ach_purchase2',name:'Double Dip',icon:'🎟️',desc:'Buy 2 items from the shop',condition:s=>s.totalPurchases>=2},
+  {id:'ach_purchase3',name:'Collector Apprentice',icon:'🧷',desc:'Buy 3 items from the shop',condition:s=>s.totalPurchases>=3},
+  {id:'ach_purchase5',name:'Shopping Spree',icon:'🛒',desc:'Buy 5 shop items',condition:s=>s.totalPurchases>=5},
+  {id:'ach_purchase8',name:'Reward Hunter',icon:'🏹',desc:'Buy 8 shop items',condition:s=>s.totalPurchases>=8},
+  {id:'ach_purchase10',name:'Premium Patron',icon:'💳',desc:'Buy 10 shop items',condition:s=>s.totalPurchases>=10},
+  {id:'ach_purchase15',name:'Ultimate Buyer',icon:'🧾',desc:'Buy 15 shop items',condition:s=>s.totalPurchases>=15},
+  {id:'ach_purchase20',name:'Treasure Spender',icon:'💰',desc:'Buy 20 shop items',condition:s=>s.totalPurchases>=20},
+  {id:'ach_purchase25',name:'Expensive Taste',icon:'💎',desc:'Buy 25 shop items',condition:s=>s.totalPurchases>=25},
+  {id:'ach_purchase30',name:'Gold Wallet',icon:'🪙',desc:'Buy 30 shop items',condition:s=>s.totalPurchases>=30},
+
+  {id:'ach_challenges1',name:'Challenge Starter',icon:'⚔️',desc:'Complete 1 challenge',condition:s=>s.challengesCompleted.length>=1},
+  {id:'ach_challenges2',name:'Challenge Seeker',icon:'🛡️',desc:'Complete 2 challenges',condition:s=>s.challengesCompleted.length>=2},
+  {id:'ach_challenges3',name:'Challenge Rider',icon:'🏹',desc:'Complete 3 challenges',condition:s=>s.challengesCompleted.length>=3},
+  {id:'ach_challenges5',name:'Challenge Veteran',icon:'🎖️',desc:'Complete 5 challenges',condition:s=>s.challengesCompleted.length>=5},
+  {id:'ach_challenges7',name:'Challenge Conqueror',icon:'🏆',desc:'Complete 7 challenges',condition:s=>s.challengesCompleted.length>=7},
+  {id:'ach_challenges10',name:'Challenge Legend',icon:'🥇',desc:'Complete 10 challenges',condition:s=>s.challengesCompleted.length>=10},
+
+  {id:'ach_quests1',name:'Quest Novice',icon:'📜',desc:'Complete 1 daily quest',condition:s=>s.dailyQuestsCompleted.length>=1},
+  {id:'ach_quests2',name:'Quest Apprentice',icon:'🎯',desc:'Complete 2 daily quests',condition:s=>s.dailyQuestsCompleted.length>=2},
+  {id:'ach_quests3',name:'Quest Master',icon:'🧙',desc:'Complete 3 daily quests',condition:s=>s.dailyQuestsCompleted.length>=3},
+  {id:'ach_quests5',name:'Quest Champion',icon:'🏅',desc:'Complete 5 daily quests',condition:s=>s.dailyQuestsCompleted.length>=5},
+  {id:'ach_quests7',name:'Quest King',icon:'👑',desc:'Complete 7 daily quests',condition:s=>s.dailyQuestsCompleted.length>=7},
+  {id:'ach_quests10',name:'Quest Legend',icon:'🌟',desc:'Complete 10 daily quests',condition:s=>s.dailyQuestsCompleted.length>=10},
+
+  {id:'ach_perfect_day',name:'Perfect Day',icon:'✨',desc:'Complete all habits in one day',condition:s=>s.hadPerfectDay},
+  {id:'ach_collector',name:'Collector',icon:'📦',desc:'Own an avatar, theme, effect, and badge',condition:s=>['av_wizard','th_dark','ef_none','bg_flame'].every(id=>s.ownedItems.includes(id))},
+  {id:'ach_theme_owner',name:'Theme Taster',icon:'🎨',desc:'Own at least one theme',condition:s=>['th_dark','th_ocean','th_forest','th_sunset','th_galaxy'].some(id=>s.ownedItems.includes(id))},
+  {id:'ach_avatar_owner',name:'Avatar Aficionado',icon:'🧙',desc:'Own at least one extra avatar',condition:s=>['av_knight','av_ninja','av_dragon','av_robot','av_fox'].some(id=>s.ownedItems.includes(id))},
+  {id:'ach_effect_owner',name:'Effect Enthusiast',icon:'✨',desc:'Own at least one effect upgrade',condition:s=>['ef_confetti','ef_stars','ef_fireworks','ef_lightning'].some(id=>s.ownedItems.includes(id))},
+  {id:'ach_badge_owner',name:'Badge Collector',icon:'🏅',desc:'Own at least one extra badge',condition:s=>['bg_crown','bg_gem','bg_rocket','bg_trophy'].some(id=>s.ownedItems.includes(id))},
+  {id:'ach_daily_login',name:'Daily Visitor',icon:'📅',desc:'Open the app on a new day and receive the login bonus',condition:s=>Object.keys(s.activityLog).length>=1},
+  {id:'ach_100_percent',name:'100% Completion',icon:'🏁',desc:'Unlock all 100 achievements',condition:s=>s.unlockedAchievements.length>=100},
 ];
 
 const STREAK_MILESTONES = [
