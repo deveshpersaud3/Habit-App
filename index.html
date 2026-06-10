@@ -530,11 +530,13 @@ h1,h2,h3,h4 { font-family: 'Space Grotesk', sans-serif; }
   display: grid; grid-template-columns: repeat(7, 1fr);
   gap: 4px; margin-top: 0.75rem;
 }
+.cal-day-label { font-size: 0.75rem; color: var(--text2); text-align: center; padding: 6px 0; font-weight: 600; text-transform: uppercase; }
+.cal-day-empty { background: transparent; }
 .cal-day {
   aspect-ratio: 1; border-radius: 5px;
-  background: var(--bg4); font-size: 0.65rem;
+  background: var(--bg4); font-size: 0.75rem;
   display: flex; align-items: center; justify-content: center;
-  color: var(--text3); transition: all 0.2s;
+  color: var(--text3); transition: all 0.2s; cursor: pointer; font-weight: 500;
 }
 .cal-day.active-day { background: var(--green2); color: white; }
 .cal-day.today { box-shadow: 0 0 0 2px var(--xp); }
@@ -549,7 +551,6 @@ h1,h2,h3,h4 { font-family: 'Space Grotesk', sans-serif; }
 .activity-detail-item.completed { color: var(--green); }
 .activity-detail-item.incomplete { color: var(--text); opacity: 0.9; }
 .activity-detail-empty { color: var(--text3); font-size: 0.78rem; }
-.cal-day-label { font-size: 0.6rem; color: var(--text3); text-align: center; padding-bottom: 3px; }
 
 /* ── RIGHT PANEL: Streak + Leaderboard ── */
 .panel-section { margin-bottom: 1.5rem; }
@@ -1087,11 +1088,62 @@ const LEVEL_XP = [0,100,250,450,700,1000,1400,1900,2500,3200];
 const SHOP_ITEMS = {
   avatars: [
     {id:'av_wizard',name:'Wizard',icon:'🧙',cost:0,desc:'Default avatar',owned:true},
-    {id:'av_knight',name:'Knight',icon:'🛡️',cost:150,desc:'Brave and bold'},
-    {id:'av_ninja',name:'Ninja',icon:'🥷',cost:200,desc:'Swift and silent'},
-    {id:'av_dragon',name:'Dragon',icon:'🐉',cost:500,desc:'Legendary power'},
-    {id:'av_robot',name:'Cyborg',icon:'🤖',cost:300,desc:'Future warrior'},
-    {id:'av_fox',name:'Fox',icon:'🦊',cost:250,desc:'Clever trickster'},
+    // ─── COMMON (50-75 coins) ───
+    {id:'av_common_cat',name:'Cat',icon:'🐱',cost:50,desc:'[COMMON] Curious feline'},
+    {id:'av_common_dog',name:'Dog',icon:'🐶',cost:50,desc:'[COMMON] Loyal companion'},
+    {id:'av_common_bear',name:'Bear',icon:'🐻',cost:60,desc:'[COMMON] Gentle giant'},
+    {id:'av_common_panda',name:'Panda',icon:'🐼',cost:60,desc:'[COMMON] Peaceful friend'},
+    {id:'av_common_rabbit',name:'Rabbit',icon:'🐰',cost:50,desc:'[COMMON] Quick hopper'},
+    {id:'av_common_monkey',name:'Monkey',icon:'🐵',cost:65,desc:'[COMMON] Playful primate'},
+    {id:'av_common_penguin',name:'Penguin',icon:'🐧',cost:60,desc:'[COMMON] Waddling bird'},
+    {id:'av_common_duck',name:'Duck',icon:'🦆',cost:50,desc:'[COMMON] Quacking friend'},
+    {id:'av_common_owl',name:'Owl',icon:'🦉',cost:70,desc:'[COMMON] Wise watcher'},
+    {id:'av_common_pig',name:'Pig',icon:'🐷',cost:55,desc:'[COMMON] Happy pig'},
+    // ─── UNCOMMON (100-175 coins) ───
+    {id:'av_knight',name:'Knight',icon:'🛡️',cost:150,desc:'[UNCOMMON] Brave and bold'},
+    {id:'av_ninja',name:'Ninja',icon:'🥷',cost:150,desc:'[UNCOMMON] Swift and silent'},
+    {id:'av_uncommon_pirate',name:'Pirate',icon:'🏴‍☠️',cost:125,desc:'[UNCOMMON] Swashbuckler'},
+    {id:'av_uncommon_astronaut',name:'Astronaut',icon:'👨‍🚀',cost:140,desc:'[UNCOMMON] Space explorer'},
+    {id:'av_uncommon_chef',name:'Chef',icon:'👨‍🍳',cost:110,desc:'[UNCOMMON] Culinary master'},
+    {id:'av_uncommon_artist',name:'Artist',icon:'👨‍🎨',cost:120,desc:'[UNCOMMON] Creative soul'},
+    {id:'av_uncommon_doctor',name:'Doctor',icon:'👨‍⚕️',cost:130,desc:'[UNCOMMON] Healer'},
+    {id:'av_uncommon_student',name:'Student',icon:'👨‍🎓',cost:100,desc:'[UNCOMMON] Knowledge seeker'},
+    {id:'av_uncommon_mage',name:'Mage',icon:'🧑‍🔬',cost:145,desc:'[UNCOMMON] Magic user'},
+    {id:'av_uncommon_detective',name:'Detective',icon:'🕵️',cost:135,desc:'[UNCOMMON] Mystery solver'},
+    // ─── RARE (200-350 coins) ───
+    {id:'av_dragon',name:'Dragon',icon:'🐉',cost:300,desc:'[RARE] Legendary power'},
+    {id:'av_robot',name:'Cyborg',icon:'🤖',cost:280,desc:'[RARE] Future warrior'},
+    {id:'av_fox',name:'Fox',icon:'🦊',cost:250,desc:'[RARE] Clever trickster'},
+    {id:'av_rare_phoenix',name:'Phoenix',icon:'🔥',cost:320,desc:'[RARE] Reborn from flames'},
+    {id:'av_rare_unicorn',name:'Unicorn',icon:'🦄',cost:310,desc:'[RARE] Magical horn'},
+    {id:'av_rare_lion',name:'Lion',icon:'🦁',cost:290,desc:'[RARE] King of beasts'},
+    {id:'av_rare_tiger',name:'Tiger',icon:'🐯',cost:300,desc:'[RARE] Striped hunter'},
+    {id:'av_rare_wolf',name:'Wolf',icon:'🐺',cost:275,desc:'[RARE] Pack leader'},
+    {id:'av_rare_eagle',name:'Eagle',icon:'🦅',cost:295,desc:'[RARE] Sky lord'},
+    {id:'av_rare_shark',name:'Shark',icon:'🦈',cost:330,desc:'[RARE] Ocean predator'},
+    // ─── EPIC (400-600 coins) ───
+    {id:'av_epic_demon',name:'Demon',icon:'😈',cost:450,desc:'[EPIC] Dark power'},
+    {id:'av_epic_vampire',name:'Vampire',icon:'🧛',cost:480,desc:'[EPIC] Immortal night'},
+    {id:'av_epic_mummy',name:'Mummy',icon:'🧟',cost:420,desc:'[EPIC] Ancient curse'},
+    {id:'av_epic_frankenstein',name:'Frankenstein',icon:'🧟‍♂️',cost:500,desc:'[EPIC] Monster creation'},
+    {id:'av_epic_alien',name:'Alien',icon:'👽',cost:550,desc:'[EPIC] Extraterrestrial'},
+    {id:'av_epic_ghost',name:'Ghost',icon:'👻',cost:400,desc:'[EPIC] Spectral spirit'},
+    {id:'av_epic_angel',name:'Angel',icon:'👼',cost:520,desc:'[EPIC] Divine light'},
+    {id:'av_epic_barbarian',name:'Barbarian',icon:'🗡️',cost:530,desc:'[EPIC] Savage warrior'},
+    {id:'av_epic_king',name:'King',icon:'👑',cost:580,desc:'[EPIC] Royal majesty'},
+    {id:'av_epic_queen',name:'Queen',icon:'💎',cost:600,desc:'[EPIC] Royal grandeur'},
+    // ─── LEGENDARY (700-1000 coins) ───
+    {id:'av_legendary_god',name:'God',icon:'⚡',cost:850,desc:'[LEGENDARY] Divine being'},
+    {id:'av_legendary_titan',name:'Titan',icon:'🏔️',cost:900,desc:'[LEGENDARY] Ancient giant'},
+    {id:'av_legendary_phoenix_supreme',name:'Supreme Phoenix',icon:'✨',cost:950,desc:'[LEGENDARY] Ultimate rebirth'},
+    {id:'av_legendary_kraken',name:'Kraken',icon:'🐙',cost:1000,desc:'[LEGENDARY] Deep terror'},
+    {id:'av_legendary_sphinx',name:'Sphinx',icon:'🦁',cost:800,desc:'[LEGENDARY] Riddle keeper'},
+    {id:'av_legendary_basilisk',name:'Basilisk',icon:'🐍',cost:850,desc:'[LEGENDARY] Deadly gaze'},
+    {id:'av_legendary_chimera',name:'Chimera',icon:'🦅',cost:900,desc:'[LEGENDARY] Hybrid beast'},
+    // ─── MYTHIC (1100-2000 coins) ───
+    {id:'av_mythic_archmage',name:'Archmage',icon:'✨',cost:1200,desc:'[MYTHIC] Master of magic'},
+    {id:'av_mythic_celestial',name:'Celestial',icon:'🌟',cost:1500,desc:'[MYTHIC] Star being'},
+    {id:'av_mythic_void_entity',name:'Void Entity',icon:'🌌',cost:2000,desc:'[MYTHIC] Beyond reality'},
   ],
   themes: [
     {id:'th_dark',name:'Midnight',icon:'🌑',cost:0,desc:'Classic dark mode',owned:true},
@@ -1803,16 +1855,41 @@ function renderActivityCalendar(){
   const el = document.getElementById('activity-calendar');
   if(!el) return;
   el.innerHTML = '';
+  
+  // Add weekday headers
+  const dayNames = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+  dayNames.forEach(name => {
+    const header = document.createElement('div');
+    header.className = 'cal-day-label';
+    header.textContent = name;
+    el.appendChild(header);
+  });
+  
   const today = new Date();
+  const startDate = new Date(today);
+  startDate.setDate(startDate.getDate() - 34);
+  
+  // Get the day of week for the start date (0 = Sunday)
+  const startDayOfWeek = startDate.getDay();
+  
+  // Add empty cells for days before start date to align with correct weekday
+  for(let i = 0; i < startDayOfWeek; i++){
+    const emptyDiv = document.createElement('div');
+    emptyDiv.className = 'cal-day-empty';
+    el.appendChild(emptyDiv);
+  }
+  
+  // Add all 35 days
   if(!selectedActivityDate) selectedActivityDate = todayKey;
-  for(let i=34; i>=0; i--){
-    const d = new Date(today);
-    d.setDate(d.getDate()-i);
+  for(let i=0; i<35; i++){
+    const d = new Date(startDate);
+    d.setDate(d.getDate() + i);
     const key = d.toISOString().split('T')[0];
-    const isToday = (i===0);
+    const isToday = (key === todayKey);
     const hasActivity = state.activityLog[key] && state.activityLog[key] > 0;
     const div = document.createElement('div');
     div.className = 'cal-day' + (hasActivity?' active-day':'') + (isToday?' today':'') + (key===selectedActivityDate?' selected':'');
+    div.textContent = d.getDate();
     div.title = key + (hasActivity?` (${state.activityLog[key]} completions)`:'');
     div.addEventListener('click', ()=>selectActivityDate(key));
     el.appendChild(div);
