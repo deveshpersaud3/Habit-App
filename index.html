@@ -1434,6 +1434,7 @@ try {
   state = saved ? {...makeState(), ...JSON.parse(saved)} : makeState();
   // ensure habits have streaks
   if(!state.habitStreaks) state.habitStreaks = {};
+  if(!state.badHabits) state.badHabits = [];
   if(!state.recentActivity) state.recentActivity = [];
   if(!state.activityLog) state.activityLog = {};
   if(!state.dailyHabitLog) state.dailyHabitLog = {};
