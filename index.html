@@ -35,6 +35,75 @@
   --radius-sm: 8px;
   --radius-lg: 16px;
   --radius-xl: 20px;
+  renderBadHabits();
+});
+
+const badHabitInputEl = document.getElementById('new-bad-habit-input');
+if(badHabitInputEl){
+  badHabitInputEl.addEventListener('keydown',e=>{
+    if(e.key==='Enter') addBadHabit();
+  });
+}
+
+function addBadHabit(){
+  const input = document.getElementById('new-bad-habit-input');
+  const name = input.value.trim();
+  if(!name){ input.focus(); return; }
+  state.badHabits.push({
+    id: nextHabitId++,
+    name,
+    avoided: 0,
+    createdAt: Date.now()
+  });
+  input.value = '';
+  document.getElementById('bad-habit-form').style.display = 'none';
+  showNotif('bad','⚠️','Bad Habit Added!','Track when you resist this habit');
+  save();
+  renderHabits();
+  addActivity(`⚠️ Added bad habit to avoid: ${name}`);
+}
+
+function toggleBadHabit(id){
+  const bh = state.badHabits.find(b=>b.id===id);
+  if(bh){
+    bh.avoided = !bh.avoided ? 1 : 0;
+    if(bh.avoided){
+      addCoins(25);
+      showNotif('coin','💪','Strong Resistance!',`+25 coins for avoiding ${bh.name}`);
+      addActivity(`💪 Resisted: ${bh.name}`);
+    }
+    save();
+    renderHabits();
+  }
+}
+
+function deleteBadHabit(id){
+  state.badHabits = state.badHabits.filter(b=>b.id!==id);
+  save();
+  renderHabits();
+}
+
+function renderBadHabits(){
+  const list = document.getElementById('bad-habits-list');
+  if(!list) return;
+  list.innerHTML = '';
+  if(state.badHabits.length === 0){
+    list.innerHTML = '<div style="text-align:center;padding:2rem;color:var(--text3);font-size:0.9rem">No bad habits added yet. Start tracking ones you want to break! 💪</div>';
+  }
+  state.badHabits.forEach(bh=>{
+    const div = document.createElement('div');
+    div.className = 'bad-habit-item' + (bh.avoided?' avoided':'');
+    div.innerHTML = `
+      <div class="bad-habit-check${bh.avoided?' checked':''}" onclick="toggleBadHabit(${bh.id})"></div>
+      <div class="bad-habit-info">
+        <div class="bad-habit-name">${escHtml(bh.name)}</div>
+        <div class="bad-habit-meta">Times avoided today</div>
+      </div>
+      ${bh.avoided?`<span class="bad-habit-counter">✓ Avoided</span>`:'<span class="bad-habit-counter">0 times</span>'}
+      <button class="bad-habit-delete-btn" onclick="deleteBadHabit(${bh.id})" title="Delete">✕</button>
+    `;
+    list.appendChild(div);
+  });
 }
 
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -362,6 +431,7 @@ h1,h2,h3,h4 { font-family: 'Space Grotesk', sans-serif; }
   border-radius: 6px; transition: all 0.15s;
   flex-shrink: 0;
 }
+.bad-habit-info { flex: 1; min-width: 0; }
 .habit-delete-btn:hover { color: var(--red); background: rgba(248,113,113,0.1); }
 
 /* Add habit form */
@@ -642,6 +712,7 @@ h1,h2,h3,h4 { font-family: 'Space Grotesk', sans-serif; }
 .notif.level { border-color: rgba(96,165,250,0.5); background: rgba(37,99,235,0.1); }
 .notif.streak-bonus { border-color: rgba(251,146,60,0.4); }
 
+.notif.bad { border-color: rgba(248,113,113,0.4); }
 @keyframes notif-in {
   from { opacity: 0; transform: translateX(20px) scale(0.95); }
   to { opacity: 1; transform: translateX(0) scale(1); }
@@ -904,6 +975,25 @@ h1,h2,h3,h4 { font-family: 'Space Grotesk', sans-serif; }
 
       <!-- Add habit form -->
       <div class="add-habit-card" id="add-form" style="display:none;margin-top:1rem">
+              <!-- Bad Habits Section -->
+              <div style="margin-top:2.5rem;padding-top:1.5rem;border-top:1px solid var(--border)">
+                <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1rem">
+                  <div>
+                    <div style="font-size:1.1rem;font-weight:700">😈 Bad Habits to Avoid</div>
+                    <div style="font-size:0.85rem;color:var(--text2);margin-top:0.2rem">Track habits you want to break</div>
+                  </div>
+                  <button class="btn btn-primary" onclick="document.getElementById('bad-habit-form').style.display=document.getElementById('bad-habit-form').style.display==='none'?'block':'none'">+ Add Bad Habit</button>
+                </div>
+                <div class="habits-container" id="bad-habits-list"></div>
+                <div class="add-habit-card" id="bad-habit-form" style="display:none;margin-top:1rem">
+                  <h3>Add a Bad Habit to Avoid</h3>
+                  <div class="add-habit-row" style="gap:0.5rem;flex-wrap:wrap">
+                    <input class="habit-input" id="new-bad-habit-input" placeholder="e.g. Eating junk food" maxlength="60">
+                    <button class="btn btn-primary" onclick="addBadHabit()">Add</button>
+                    <button class="btn btn-ghost" onclick="document.getElementById('bad-habit-form').style.display='none'">Cancel</button>
+                  </div>
+                </div>
+              </div>
         <h3>Add a New Habit</h3>
         <div class="add-habit-row" style="gap:0.5rem;flex-wrap:wrap">
           <input class="habit-input" id="new-habit-input" placeholder="e.g. Meditate for 10 minutes" maxlength="60">
@@ -1316,6 +1406,7 @@ function makeState(){
     bestStreak: 0,
     lastActiveDate: null,
     habits: [],
+      badHabits: [],
     habitStreaks: {},
     maxHabitStreak: 0,
     totalCompletions: 0,
