@@ -975,25 +975,6 @@ h1,h2,h3,h4 { font-family: 'Space Grotesk', sans-serif; }
 
       <!-- Add habit form -->
       <div class="add-habit-card" id="add-form" style="display:none;margin-top:1rem">
-              <!-- Bad Habits Section -->
-              <div style="margin-top:2.5rem;padding-top:1.5rem;border-top:1px solid var(--border)">
-                <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1rem">
-                  <div>
-                    <div style="font-size:1.1rem;font-weight:700">😈 Bad Habits to Avoid</div>
-                    <div style="font-size:0.85rem;color:var(--text2);margin-top:0.2rem">Track habits you want to break</div>
-                  </div>
-                  <button class="btn btn-primary" onclick="document.getElementById('bad-habit-form').style.display=document.getElementById('bad-habit-form').style.display==='none'?'block':'none'">+ Add Bad Habit</button>
-                </div>
-                <div class="habits-container" id="bad-habits-list"></div>
-                <div class="add-habit-card" id="bad-habit-form" style="display:none;margin-top:1rem">
-                  <h3>Add a Bad Habit to Avoid</h3>
-                  <div class="add-habit-row" style="gap:0.5rem;flex-wrap:wrap">
-                    <input class="habit-input" id="new-bad-habit-input" placeholder="e.g. Eating junk food" maxlength="60">
-                    <button class="btn btn-primary" onclick="addBadHabit()">Add</button>
-                    <button class="btn btn-ghost" onclick="document.getElementById('bad-habit-form').style.display='none'">Cancel</button>
-                  </div>
-                </div>
-              </div>
         <h3>Add a New Habit</h3>
         <div class="add-habit-row" style="gap:0.5rem;flex-wrap:wrap">
           <input class="habit-input" id="new-habit-input" placeholder="e.g. Meditate for 10 minutes" maxlength="60">
@@ -1007,6 +988,26 @@ h1,h2,h3,h4 { font-family: 'Space Grotesk', sans-serif; }
           </select>
           <button class="btn btn-primary" onclick="addHabit()">Add</button>
           <button class="btn btn-ghost" onclick="document.getElementById('add-form').style.display='none'">Cancel</button>
+        </div>
+      </div>
+
+      <!-- Bad Habits Section -->
+      <div style="margin-top:2.5rem;padding-top:1.5rem;border-top:1px solid var(--border)">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1rem">
+          <div>
+            <div style="font-size:1.1rem;font-weight:700">😈 Bad Habits to Avoid</div>
+            <div style="font-size:0.85rem;color:var(--text2);margin-top:0.2rem">Track habits you want to break</div>
+          </div>
+          <button class="btn btn-primary" onclick="document.getElementById('bad-habit-form').style.display=document.getElementById('bad-habit-form').style.display==='none'?'block':'none'">+ Add Bad Habit</button>
+        </div>
+        <div class="habits-container" id="bad-habits-list"></div>
+        <div class="add-habit-card" id="bad-habit-form" style="display:none;margin-top:1rem">
+          <h3>Add a Bad Habit to Avoid</h3>
+          <div class="add-habit-row" style="gap:0.5rem;flex-wrap:wrap">
+            <input class="habit-input" id="new-bad-habit-input" placeholder="e.g. Eating junk food" maxlength="60">
+            <button class="btn btn-primary" onclick="addBadHabit()">Add</button>
+            <button class="btn btn-ghost" onclick="document.getElementById('bad-habit-form').style.display='none'">Cancel</button>
+          </div>
         </div>
       </div>
     </div>
